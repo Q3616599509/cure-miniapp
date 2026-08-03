@@ -1,0 +1,16 @@
+{
+  "navigationBarTitleText": "商品详情",
+  "navigationBarBackgroundColor": "#ffffff",
+  "navigationBarTextStyle": "black",
+  "backgroundColor": "#f5f6fa",
+  "usingComponents": {
+    "t-icon": "tdesign-miniprogram/icon/icon",
+    "t-button": "tdesign-miniprogram/button/button",
+    "t-tag": "tdesign-miniprogram/tag/tag",
+    "t-popup": "tdesign-miniprogram/popup/popup",
+    "t-stepper": "tdesign-miniprogram/stepper/stepper",
+    "t-loading": "tdesign-miniprogram/loading/loading",
+    "t-image": "tdesign-miniprogram/image/image",
+    "t-toast": "tdesign-miniprogram/toast/toast"
+  }
+}

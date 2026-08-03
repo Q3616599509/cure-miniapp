@@ -1,0 +1,126 @@
+<!--pages/cart/cart.wxml — 购物车页-->
+<view class="cart-page">
+
+  <!-- ═══ 顶部操作栏 ═══ -->
+  <view class="cart-header" wx:if="{{cartItems.length > 0}}">
+    <text class="cart-header__title">购物车 ({{totalCount}})</text>
+    <view class="cart-header__actions">
+      <text class="cart-header__edit" bindtap="onToggleEdit">
+        {{isEdit ? '完成' : '编辑'}}
+      </text>
+      <text class="cart-header__clear" bindtap="onClearCart">清空</text>
+    </view>
+  </view>
+
+  <!-- ═══ 加载中 ═══ -->
+  <view class="cart-loading" wx:if="{{loading}}">
+    <t-loading theme="circular" size="48rpx" text="加载中..." />
+  </view>
+
+  <!-- ═══ 购物车列表 ═══ -->
+  <view class="cart-list" wx:elif="{{cartItems.length > 0}}">
+
+    <t-swipe-cell
+      wx:for="{{cartItems}}"
+      wx:key="id"
+      right="{{swipeRightActions}}"
+      bind:click="onDeleteItem"
+      data-id="{{item.id}}"
+    >
+      <view class="cart-item">
+        <!-- 选中框 -->
+        <view
+          class="cart-item__check {{item.checked ? 'cart-item__check--active' : ''}}"
+          data-id="{{item.id}}"
+          bindtap="onItemToggle"
+        >
+          <t-icon name="check" size="28rpx" color="#fff" wx:if="{{item.checked}}" />
+        </view>
+
+        <!-- 商品图片 -->
+        <view class="cart-item__image" data-id="{{item.product_id}}" bindtap="onProductTap">
+          <t-image
+            src="{{item.product_images[0] || '/assets/product-placeholder.png'}}"
+            mode="aspectFill"
+            width="160rpx"
+            height="160rpx"
+            shape="round"
+            lazy
+          />
+        </view>
+
+        <!-- 商品信息 -->
+        <view class="cart-item__info">
+          <text
+            class="cart-item__name text-ellipsis"
+            data-id="{{item.product_id}}"
+            bindtap="onProductTap"
+          >{{item.product_name}}</text>
+          <text class="cart-item__spec" wx:if="{{item.sku_id}}">已选规格</text>
+          <view class="cart-item__bottom">
+            <view class="cart-item__price">
+              <text class="price-symbol text-primary">¥</text>
+              <text class="price-integer text-primary">{{item.sale_price}}</text>
+            </view>
+            <t-stepper
+              value="{{item.quantity}}"
+              min="1"
+              max="{{item.stock}}"
+              theme="filled"
+              size="small"
+              data-id="{{item.id}}"
+              bind:change="onQuantityChange"
+            />
+          </view>
+        </view>
+      </view>
+    </t-swipe-cell>
+
+    <!-- 底部占位 -->
+    <view style="height: 140rpx;"></view>
+  </view>
+
+  <!-- ═══ 空状态 ═══ -->
+  <view class="cart-empty" wx:else>
+    <view class="cart-empty__icon">
+      <t-icon name="cart" size="160rpx" color="#ddd" />
+    </view>
+    <text class="cart-empty__text">购物车空空如也</text>
+    <text class="cart-empty__subtext">快去挑选你心仪的好物吧</text>
+    <view class="cart-empty__btn" bindtap="onGoShopping">去逛逛</view>
+  </view>
+
+  <!-- ═══ 底部结算栏 ═══ -->
+  <view class="checkout-bar safe-bottom-fixed" wx:if="{{cartItems.length > 0}}">
+    <view class="checkout-bar__left">
+      <view
+        class="checkout-bar__check {{allSelected ? 'checkout-bar__check--active' : ''}}"
+        bindtap="onToggleAll"
+      >
+        <t-icon name="check" size="28rpx" color="#fff" wx:if="{{allSelected}}" />
+      </view>
+      <text class="checkout-bar__all">全选</text>
+      <view class="checkout-bar__total" wx:if="{{!isEdit}}">
+        <text class="checkout-bar__total-label">合计：</text>
+        <text class="price-symbol text-primary">¥</text>
+        <text class="checkout-bar__total-num text-primary">{{totalPrice}}</text>
+      </view>
+    </view>
+    <view class="checkout-bar__right">
+      <view
+        wx:if="{{isEdit}}"
+        class="checkout-bar__btn checkout-bar__btn--delete"
+        bindtap="onBatchDelete"
+      >
+        删除({{selectedCount}})
+      </view>
+      <view
+        wx:else
+        class="checkout-bar__btn checkout-bar__btn--checkout"
+        bindtap="onCheckout"
+      >
+        去结算({{selectedCount}})
+      </view>
+    </view>
+  </view>
+</view>

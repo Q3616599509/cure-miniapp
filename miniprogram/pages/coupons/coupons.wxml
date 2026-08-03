@@ -1,0 +1,99 @@
+<!-- pages/coupons/coupons.wxml -->
+<view class="coupons-page">
+  <!-- Tabs -->
+  <t-tabs value="{{activeTab}}" bind:change="onTabChange" theme="card">
+    <t-tab-panel label="可领取" value="0" />
+    <t-tab-panel label="我的优惠券" value="1" />
+  </t-tabs>
+
+  <!-- Available Coupons -->
+  <view class="coupon-list" wx:if="{{activeTab === 0}}">
+    <view class="loading-wrap" wx:if="{{loading && availableCoupons.length === 0}}">
+      <t-loading theme="circular" size="40rpx" text="加载中..." />
+    </view>
+
+    <t-empty wx:elif="{{availableCoupons.length === 0}}" description="暂无可领取的优惠券" />
+
+    <view wx:else>
+      <view class="coupon-card" wx:for="{{availableCoupons}}" wx:key="id">
+        <view class="coupon-left {{item.type === 'discount' ? 'discount' : item.type === 'free_delivery' ? 'free' : ''}}">
+          <view class="coupon-value">
+            <block wx:if="{{item.type === 'discount'}}">
+              <text class="value-num">{{item.valueText}}</text>
+            </block>
+            <block wx:elif="{{item.type === 'free_delivery'}}">
+              <text class="value-text">{{item.valueText}}</text>
+            </block>
+            <block wx:else>
+              <text class="value-symbol">¥</text>
+              <text class="value-num">{{item.valueText}}</text>
+            </block>
+          </view>
+          <view class="coupon-type-text">{{item.typeText}}</view>
+        </view>
+        <view class="coupon-right">
+          <view class="coupon-name">{{item.name}}</view>
+          <view class="coupon-threshold">{{item.thresholdText}}</view>
+          <view class="coupon-desc">{{item.description}}</view>
+          <view class="coupon-valid">{{item.validText}}</view>
+          <t-button size="small" theme="primary" data-coupon="{{item}}" bindtap="onClaimCoupon">
+            立即领取
+          </t-button>
+        </view>
+        <view class="coupon-split"></view>
+      </view>
+    </view>
+  </view>
+
+  <!-- My Coupons -->
+  <view class="coupon-list" wx:if="{{activeTab === 1}}">
+    <!-- Filter -->
+    <view class="filter-bar">
+      <view class="filter-item {{myCouponFilter === 0 ? 'active' : ''}}" data-value="0" bindtap="onMyCouponFilterChange">未使用</view>
+      <view class="filter-item {{myCouponFilter === 1 ? 'active' : ''}}" data-value="1" bindtap="onMyCouponFilterChange">已使用</view>
+      <view class="filter-item {{myCouponFilter === 2 ? 'active' : ''}}" data-value="2" bindtap="onMyCouponFilterChange">已过期</view>
+    </view>
+
+    <!-- Not logged in -->
+    <view class="login-tip" wx:if="{{!isLoggedIn}}">
+      <t-empty description="登录后查看优惠券" />
+      <t-button theme="primary" bindtap="onLoginTap" style="width: 320rpx; margin-top: 24rpx;">去登录</t-button>
+    </view>
+
+    <block wx:else>
+      <!-- Filtered coupons -->
+      <view class="my-coupon-list" wx:if="{{filteredMyCoupons.length > 0}}">
+        <view class="coupon-card {{item.isUsed ? 'used' : ''}} {{item.isExpired ? 'expired' : ''}}"
+          wx:for="{{filteredMyCoupons}}" wx:key="id">
+          <view class="coupon-left {{item.type === 'discount' ? 'discount' : item.type === 'free_delivery' ? 'free' : ''}}">
+            <view class="coupon-value">
+              <block wx:if="{{item.type === 'discount'}}">
+                <text class="value-num">{{item.valueText}}</text>
+              </block>
+              <block wx:elif="{{item.type === 'free_delivery'}}">
+                <text class="value-text">{{item.valueText}}</text>
+              </block>
+              <block wx:else>
+                <text class="value-symbol">¥</text>
+                <text class="value-num">{{item.valueText}}</text>
+              </block>
+            </view>
+            <view class="coupon-type-text">{{item.typeText}}</view>
+          </view>
+          <view class="coupon-right">
+            <view class="coupon-name">{{item.name}}</view>
+            <view class="coupon-threshold">{{item.thresholdText}}</view>
+            <view class="coupon-desc">{{item.description}}</view>
+            <view class="coupon-expire">有效期至 {{item.expireText}}</view>
+            <view class="coupon-status-tag" wx:if="{{item.isUsed || item.isExpired}}">
+              {{item.statusText}}
+            </view>
+          </view>
+          <view class="coupon-split"></view>
+        </view>
+      </view>
+
+      <t-empty wx:else description="暂无优惠券" />
+    </block>
+  </view>
+</view>

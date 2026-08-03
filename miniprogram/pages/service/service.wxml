@@ -1,0 +1,103 @@
+<!-- pages/service/service.wxml — AI Smart Customer Service -->
+<view class="service-page">
+  <!-- Header -->
+  <view class="service-header">
+    <view class="service-header-icon">💚</view>
+    <view class="service-header-info">
+      <view class="service-header-title">Cure 智能客服</view>
+      <view class="service-header-sub">AI 在线 · 秒级响应</view>
+    </view>
+    <view class="service-header-call" bindtap="onCallService">
+      <t-icon name="call" size="36rpx" color="#835C45" />
+      <text>拨打电话</text>
+    </view>
+  </view>
+
+  <!-- Chat Messages -->
+  <scroll-view
+    class="chat-body"
+    scroll-y="true"
+    scroll-with-animation="true"
+    scroll-into-view="{{scrollToView}}"
+    enhanced="true"
+    show-scrollbar="{{false}}"
+  >
+    <!-- Quick FAQs -->
+    <view class="quick-faqs" wx:if="{{showQuickFaqs && messages.length <= 1}}">
+      <view class="faq-title">💡 常见问题 · 点击快速提问</view>
+      <view class="faq-list">
+        <view class="faq-chip"
+          wx:for="{{['如何查询订单状态？','怎么退货退款？','门店在哪里？','会员有什么权益？','优惠券怎么用？','多久能发货？']}}"
+          wx:key="*this"
+          data-query="{{item}}"
+          bindtap="onFaqTap"
+        >{{item}}</view>
+      </view>
+    </view>
+
+    <!-- Messages -->
+    <view class="msg-list">
+      <view
+        class="msg-item {{item.type === 'user' ? 'msg-user' : 'msg-bot'}}"
+        wx:for="{{messages}}" wx:key="id"
+        id="{{item.id}}"
+      >
+        <!-- Bot avatar -->
+        <view class="msg-avatar" wx:if="{{item.type === 'bot'}}">💚</view>
+
+        <view class="msg-bubble-wrap">
+          <view class="msg-bubble {{item.type === 'user' ? 'bubble-user' : 'bubble-bot'}}">
+            <text>{{item.text}}</text>
+          </view>
+
+          <!-- Follow-up action button -->
+          <view class="msg-followup" wx:if="{{item.followUp}}">
+            <view class="followup-chip" data-action="{{item.followUp}}" bindtap="onFollowUp">
+              <t-icon name="chevron-right" size="28rpx" color="#835C45" />
+              <text>{{item.followUp}}</text>
+            </view>
+          </view>
+
+          <view class="msg-time">{{item.time}}</view>
+        </view>
+
+        <!-- User avatar -->
+        <view class="msg-avatar" wx:if="{{item.type === 'user'}}">👤</view>
+      </view>
+
+      <!-- Typing indicator -->
+      <view class="msg-item msg-bot" wx:if="{{isTyping}}">
+        <view class="msg-avatar">💚</view>
+        <view class="msg-bubble-wrap">
+          <view class="msg-bubble bubble-bot typing-bubble">
+            <view class="typing-dot"></view>
+            <view class="typing-dot"></view>
+            <view class="typing-dot"></view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- Bottom spacer -->
+    <view style="height: 40rpx;"></view>
+  </scroll-view>
+
+  <!-- Input Bar -->
+  <view class="chat-input-bar cure-safe-bottom">
+    <view class="chat-input-wrap">
+      <input
+        class="chat-input"
+        value="{{inputValue}}"
+        placeholder="输入您的问题..."
+        placeholder-class="input-placeholder"
+        confirm-type="send"
+        bindinput="onInputChange"
+        bindconfirm="onSend"
+        adjust-position="{{true}}"
+      />
+    </view>
+    <view class="chat-send-btn {{inputValue ? 'active' : ''}}" bindtap="onSend">
+      <t-icon name="send" size="36rpx" color="{{inputValue ? '#fff' : '#ccc'}}" />
+    </view>
+  </view>
+</view>

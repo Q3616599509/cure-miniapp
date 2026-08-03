@@ -1,0 +1,57 @@
+<!-- pages/address/address.wxml -->
+<view class="address-page">
+  <!-- Loading -->
+  <view class="loading-wrap" wx:if="{{loading}}">
+    <t-loading theme="circular" size="40rpx" text="加载中..." />
+  </view>
+
+  <!-- Empty State -->
+  <view class="empty-wrap" wx:elif="{{addresses.length === 0}}">
+    <t-empty icon="location" description="还没有收货地址">
+      <view slot="action" class="empty-actions">
+        <t-button theme="primary" bindtap="onAddTap" style="width: 280rpx;">新增地址</t-button>
+        <t-button theme="light" bindtap="onImportWeChat" style="width: 280rpx; margin-top: 16rpx;">导入微信地址</t-button>
+      </view>
+    </t-empty>
+  </view>
+
+  <!-- Address List -->
+  <view wx:else>
+    <view class="address-list">
+      <t-swipe-cell
+        wx:for="{{addresses}}" wx:key="id"
+        right="{{item.swipeActions}}"
+        data-id="{{item.id}}"
+        bind:click="onSwipeAction">
+        <view class="address-card" data-address="{{item}}" bindtap="onAddressTap">
+          <view class="address-card-top">
+            <text class="address-name">{{item.name}}</text>
+            <text class="address-phone">{{item.phone}}</text>
+            <t-tag size="small" theme="warning" variant="light" wx:if="{{item.isDefault}}">默认</t-tag>
+          </view>
+          <view class="address-detail">{{item.fullAddress}}</view>
+          <view class="address-actions" wx:if="{{!item.isDefault}}">
+            <text class="action-text" data-id="{{item.id}}" catchtap="onSetDefault">设为默认</text>
+          </view>
+          <view class="address-actions" wx:else>
+            <text class="action-text default-label">默认地址</text>
+          </view>
+        </view>
+      </t-swipe-cell>
+    </view>
+
+    <!-- Import WeChat Button -->
+    <view class="import-section">
+      <t-button theme="light" block bindtap="onImportWeChat" icon="download">
+        导入微信地址
+      </t-button>
+    </view>
+  </view>
+
+  <!-- Add Button (fixed bottom) -->
+  <view class="bottom-bar cure-safe-bottom" wx:if="{{addresses.length > 0}}">
+    <t-button theme="primary" block bindtap="onAddTap" icon="add">
+      {{addButtonText}}
+    </t-button>
+  </view>
+</view>

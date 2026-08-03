@@ -1,0 +1,105 @@
+/* pages/address/address.wxss */
+.address-page {
+  min-height: 100vh;
+  background: var(--cure-bg-page);
+  padding: 16rpx 24rpx 140rpx;
+}
+
+.loading-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 120rpx 0;
+}
+
+.empty-wrap {
+  padding: 80rpx 0;
+}
+
+.empty-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 24rpx;
+}
+
+/* ── Address Card ── */
+.address-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.address-card {
+  background: #fff;
+  border-radius: var(--cure-radius-lg);
+  padding: 28rpx;
+  box-shadow: var(--cure-shadow-sm);
+}
+
+.address-card-top {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  margin-bottom: 12rpx;
+}
+
+.address-name {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--cure-text-primary);
+}
+
+.address-phone {
+  font-size: 28rpx;
+  color: var(--cure-text-secondary);
+}
+
+.address-detail {
+  font-size: 28rpx;
+  color: var(--cure-text-primary);
+  line-height: 1.5;
+}
+
+.address-actions {
+  margin-top: 16rpx;
+  padding-top: 16rpx;
+  border-top: 1rpx solid #f0f0f0;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.action-text {
+  font-size: 24rpx;
+  color: var(--cure-primary);
+  padding: 4rpx 16rpx;
+}
+
+.default-label {
+  color: var(--cure-text-placeholder);
+}
+
+/* ── Import Section ── */
+.import-section {
+  margin-top: 24rpx;
+}
+
+/* ── Swipe Cell Override ── */
+.swipe-edit {
+  background: var(--cure-info) !important;
+}
+
+.swipe-delete {
+  background: var(--cure-error) !important;
+}
+
+/* ── Bottom Bar ── */
+.bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 24rpx 32rpx;
+  background: #fff;
+  box-shadow: 0 -4rpx 16rpx rgba(0, 0, 0, 0.06);
+  z-index: 90;
+}

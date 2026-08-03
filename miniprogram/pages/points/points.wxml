@@ -1,0 +1,104 @@
+<!-- pages/points/points.wxml -->
+<view class="points-page">
+  <!-- Not logged in -->
+  <view class="not-logged-in" wx:if="{{!isLoggedIn}}">
+    <view class="login-prompt">
+      <view class="login-icon">🎁</view>
+      <view class="login-title">登录后查看积分</view>
+      <t-button theme="primary" bindtap="onLoginTap" style="margin-top: 32rpx; width: 320rpx;">去登录</t-button>
+    </view>
+  </view>
+
+  <block wx:else>
+    <!-- Points Balance Header -->
+    <view class="points-header">
+      <view class="points-header-bg"></view>
+      <view class="points-header-content">
+        <view class="points-balance-label">我的积分</view>
+        <view class="points-balance-value">{{pointsBalance}}</view>
+        <view class="points-multiplier">
+          当前等级积分倍率 {{pointsMultiplier}}x · 消费1元 = {{pointsMultiplier}}积分
+        </view>
+      </view>
+    </view>
+
+    <!-- Points Rules -->
+    <view class="section">
+      <view class="section-title">积分规则</view>
+      <view class="rules-list">
+        <view class="rule-item">
+          <view class="rule-icon">⚡</view>
+          <view class="rule-content">
+            <view class="rule-name">消费获取积分</view>
+            <view class="rule-desc">每消费1元获得{{pointsMultiplier}}积分（根据等级倍率）</view>
+          </view>
+        </view>
+        <view class="rule-item">
+          <view class="rule-icon">🎁</view>
+          <view class="rule-content">
+            <view class="rule-name">积分兑换</view>
+            <view class="rule-desc">积分可兑换优惠券、实物商品等</view>
+          </view>
+        </view>
+        <view class="rule-item">
+          <view class="rule-icon">⏰</view>
+          <view class="rule-content">
+            <view class="rule-name">积分有效期</view>
+            <view class="rule-desc">积分自获取起1年内有效，到期自动清零</view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- Tabs -->
+    <t-tabs value="{{activeTab}}" bind:change="onTabChange" theme="card">
+      <t-tab-panel label="积分兑换" value="0" />
+      <t-tab-panel label="兑换记录" value="1" />
+    </t-tabs>
+
+    <!-- Exchange Products -->
+    <view class="exchange-list" wx:if="{{activeTab === 0}}">
+      <view class="exchange-card" wx:for="{{exchangeProducts}}" wx:key="id">
+        <view class="exchange-img">{{item.image}}</view>
+        <view class="exchange-info">
+          <view class="exchange-name cure-ellipsis-2">{{item.name}}</view>
+          <view class="exchange-price">
+            <text class="exchange-points">{{item.points}}积分</text>
+            <text class="exchange-cash" wx:if="{{item.cash > 0}}">+ ¥{{item.cash}}</text>
+          </view>
+          <t-button
+            size="small"
+            theme="{{pointsBalance >= item.points ? 'primary' : 'default'}}"
+            disabled="{{pointsBalance < item.points}}"
+            data-product="{{item}}"
+            bindtap="onExchange"
+            style="margin-top: 12rpx; width: 100%;">
+            {{pointsBalance >= item.points ? '立即兑换' : '积分不足'}}
+          </t-button>
+        </view>
+      </view>
+    </view>
+
+    <!-- Exchange History -->
+    <view class="history-list" wx:if="{{activeTab === 1}}">
+      <view class="history-item" wx:for="{{exchangeHistory}}" wx:key="id">
+        <view class="history-info">
+          <view class="history-name">{{item.name}}</view>
+          <view class="history-time">{{item.time}}</view>
+        </view>
+        <view class="history-points">-{{item.points}}积分</view>
+      </view>
+      <t-empty wx:if="{{exchangeHistory.length === 0}}" description="暂无兑换记录" />
+    </view>
+
+    <!-- Points Detail Button -->
+    <view class="bottom-btn cure-safe-bottom">
+      <t-button theme="light" block bindtap="goToPointsLog">查看积分明细</t-button>
+    </view>
+  </block>
+
+  <!-- Loading -->
+  <view class="loading-wrap" wx:if="{{loading && isLoggedIn}}">
+    <t-loading theme="circular" size="40rpx" text="加载中..." />
+  </view>
+</view>

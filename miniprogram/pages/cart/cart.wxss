@@ -1,0 +1,235 @@
+/* pages/cart/cart.wxss — 购物车页样式 */
+.cart-page {
+  min-height: 100vh;
+  background: var(--color-bg);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* ── 顶部操作栏 ──────────────────────────────────────── */
+.cart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24rpx;
+  background: #fff;
+}
+
+.cart-header__title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.cart-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 32rpx;
+}
+
+.cart-header__edit {
+  font-size: 28rpx;
+  color: var(--color-primary);
+}
+
+.cart-header__clear {
+  font-size: 28rpx;
+  color: var(--color-text-placeholder);
+}
+
+/* ── 加载中 ──────────────────────────────────────────── */
+.cart-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 400rpx;
+}
+
+/* ── 购物车列表 ──────────────────────────────────────── */
+.cart-list {
+  padding: 16rpx 0;
+}
+
+/* ── 购物车项 ────────────────────────────────────────── */
+.cart-item {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  margin: 0 24rpx 16rpx;
+  padding: 24rpx;
+  border-radius: var(--radius-lg);
+  gap: 20rpx;
+}
+
+.cart-item__check {
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 50%;
+  border: 2rpx solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+
+.cart-item__check--active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.cart-item__image {
+  flex-shrink: 0;
+}
+
+.cart-item__info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.cart-item__name {
+  font-size: 28rpx;
+  color: var(--color-text-primary);
+  font-weight: 500;
+  max-width: 360rpx;
+}
+
+.cart-item__spec {
+  font-size: 24rpx;
+  color: var(--color-text-placeholder);
+  background: var(--color-bg);
+  padding: 4rpx 12rpx;
+  border-radius: var(--radius-sm);
+  align-self: flex-start;
+}
+
+.cart-item__bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 8rpx;
+}
+
+.cart-item__price {
+  display: flex;
+  align-items: baseline;
+}
+
+/* ── 滑动删除按钮 ────────────────────────────────────── */
+.swipe-delete-btn {
+  background: var(--color-danger) !important;
+}
+
+/* ── 空状态 ──────────────────────────────────────────── */
+.cart-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-top: 200rpx;
+}
+
+.cart-empty__icon {
+  margin-bottom: 32rpx;
+}
+
+.cart-empty__text {
+  font-size: 32rpx;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+}
+
+.cart-empty__subtext {
+  font-size: 26rpx;
+  color: var(--color-text-placeholder);
+  margin-top: 12rpx;
+}
+
+.cart-empty__btn {
+  margin-top: 48rpx;
+  padding: 20rpx 64rpx;
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 28rpx;
+  border-radius: 40rpx;
+  font-weight: 500;
+}
+
+/* ── 底部结算栏 ──────────────────────────────────────── */
+.checkout-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fff;
+  padding: 16rpx 24rpx;
+  box-shadow: 0 -2rpx 16rpx rgba(0, 0, 0, 0.06);
+  height: 100rpx;
+}
+
+.checkout-bar__left {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.checkout-bar__check {
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 50%;
+  border: 2rpx solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.checkout-bar__check--active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.checkout-bar__all {
+  font-size: 28rpx;
+  color: var(--color-text-regular);
+}
+
+.checkout-bar__total {
+  display: flex;
+  align-items: baseline;
+  margin-left: 16rpx;
+}
+
+.checkout-bar__total-label {
+  font-size: 26rpx;
+  color: var(--color-text-secondary);
+}
+
+.checkout-bar__total-num {
+  font-size: 40rpx;
+  font-weight: 700;
+}
+
+.checkout-bar__right {
+  display: flex;
+  align-items: center;
+}
+
+.checkout-bar__btn {
+  padding: 20rpx 48rpx;
+  border-radius: 40rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+  text-align: center;
+}
+
+.checkout-bar__btn--checkout {
+  background: linear-gradient(135deg, #FF5C39, #FF3B3B);
+  color: #fff;
+}
+
+.checkout-bar__btn--delete {
+  background: var(--color-danger);
+  color: #fff;
+}

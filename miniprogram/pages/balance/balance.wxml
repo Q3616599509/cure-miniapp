@@ -1,0 +1,60 @@
+<!-- pages/balance/balance.wxml -->
+<view class="balance-page">
+  <!-- Not logged in -->
+  <view class="not-logged-in" wx:if="{{!isLoggedIn}}">
+    <view class="login-prompt">
+      <view class="login-icon">💰</view>
+      <view class="login-title">登录后查看余额</view>
+      <t-button theme="primary" bindtap="onLoginTap" style="margin-top: 32rpx; width: 320rpx;">去登录</t-button>
+    </view>
+  </view>
+
+  <block wx:else>
+    <!-- Balance Header -->
+    <view class="balance-header">
+      <view class="balance-header-bg"></view>
+      <view class="balance-header-content">
+        <view class="balance-label">账户余额 (元)</view>
+        <view class="balance-value">{{balance}}</view>
+      </view>
+    </view>
+
+    <!-- Recharge Section -->
+    <view class="section">
+      <view class="section-title">充值金额</view>
+      <view class="recharge-grid">
+        <view class="recharge-card {{selectedAmount === item.amount ? 'active' : ''}}"
+          wx:for="{{rechargeOptions}}" wx:key="amount"
+          data-amount="{{item.amount}}"
+          bindtap="onRechargeSelect">
+          <view class="recharge-amount">{{item.amount}}元</view>
+          <view class="recharge-bonus" wx:if="{{item.bonus > 0}}">送{{item.bonus}}元</view>
+        </view>
+      </view>
+      <t-button theme="primary" block bindtap="onRecharge" disabled="{{selectedAmount === 0}}" style="margin-top: 24rpx;">
+        立即充值
+      </t-button>
+    </view>
+
+    <!-- Transaction History -->
+    <view class="section">
+      <view class="section-title">交易记录</view>
+      <view class="loading-wrap" wx:if="{{loading}}">
+        <t-loading theme="circular" size="40rpx" text="加载中..." />
+      </view>
+      <t-empty wx:elif="{{transactions.length === 0}}" description="暂无交易记录" />
+      <view wx:else class="transaction-list">
+        <view class="transaction-item" wx:for="{{transactions}}" wx:key="id">
+          <view class="transaction-icon">{{item.typeIcon}}</view>
+          <view class="transaction-info">
+            <view class="transaction-desc cure-ellipsis">{{item.description}}</view>
+            <view class="transaction-time">{{item.timeText}}</view>
+          </view>
+          <view class="transaction-amount {{item.isIncome ? 'income' : 'expense'}}">
+            {{item.amountText}}
+          </view>
+        </view>
+      </view>
+    </view>
+  </block>
+</view>

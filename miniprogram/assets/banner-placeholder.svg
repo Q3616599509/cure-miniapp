@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="750" height="350" viewBox="0 0 750 350">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#835C45"/>
+      <stop offset="50%" style="stop-color:#A67B5E"/>
+      <stop offset="100%" style="stop-color:#D4A882"/>
+    </linearGradient>
+  </defs>
+  <rect width="750" height="350" fill="url(#bg)" rx="16"/>
+  <text x="375" y="160" text-anchor="middle" font-family="sans-serif" font-size="42" font-weight="bold" fill="#fff" opacity="0.9">Cure 治愈优选</text>
+  <text x="375" y="210" text-anchor="middle" font-family="sans-serif" font-size="22" fill="#fff" opacity="0.7">治愈你的日常好物</text>
+</svg>

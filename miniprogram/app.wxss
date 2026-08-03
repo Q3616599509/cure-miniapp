@@ -1,0 +1,380 @@
+/* app.wxss — Cure 全局样式 */
+
+/* ── 设计变量 ──────────────────────────────────────── */
+page {
+  --color-primary: #FF5C39;
+  --color-primary-light: #FFF0EC;
+  --color-primary-dark: #E64A2A;
+  --color-secondary: #FFB800;
+  --color-success: #07C160;
+  --color-danger: #FA5151;
+  --color-warning: #FF976A;
+  --color-info: #0080FF;
+
+  --color-bg: #F5F6FA;
+  --color-card: #FFFFFF;
+  --color-mask: rgba(0, 0, 0, 0.6);
+
+  --color-text-primary: #1A1A1A;
+  --color-text-regular: #333333;
+  --color-text-secondary: #666666;
+  --color-text-placeholder: #999999;
+  --color-text-disabled: #C0C4CC;
+
+  --color-border: #EBEDF0;
+  --color-border-light: #F2F3F5;
+
+  --radius-sm: 8rpx;
+  --radius-md: 12rpx;
+  --radius-lg: 16rpx;
+  --radius-xl: 24rpx;
+  --radius-round: 999rpx;
+
+  --shadow-sm: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4rpx 16rpx rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8rpx 32rpx rgba(0, 0, 0, 0.12);
+
+  --spacing-xs: 8rpx;
+  --spacing-sm: 16rpx;
+  --spacing-md: 24rpx;
+  --spacing-lg: 32rpx;
+  --spacing-xl: 48rpx;
+
+  /* ── Cure page variables (used by member/order-now/etc pages) ── */
+  --cure-primary: #835C45;
+  --cure-primary-light: #A67B5E;
+  --cure-primary-dark: #5D4030;
+  --cure-accent: #D4A574;
+  --cure-gold: #C9A86A;
+  --cure-silver: #B0B0B0;
+  --cure-diamond: #4FC3F7;
+
+  --cure-success: #52C41A;
+  --cure-warning: #FAAD14;
+  --cure-error: #FF4D4F;
+  --cure-info: #1890FF;
+
+  --cure-text-primary: #1A1A1A;
+  --cure-text-secondary: #666666;
+  --cure-text-placeholder: #999999;
+  --cure-text-disabled: #CCCCCC;
+  --cure-border: #E8E8E8;
+  --cure-bg-page: #F5F5F5;
+  --cure-bg-card: #FFFFFF;
+  --cure-bg-mask: rgba(0, 0, 0, 0.6);
+
+  --cure-spacing-xs: 8rpx;
+  --cure-spacing-sm: 16rpx;
+  --cure-spacing-md: 24rpx;
+  --cure-spacing-lg: 32rpx;
+  --cure-spacing-xl: 48rpx;
+
+  --cure-radius-sm: 8rpx;
+  --cure-radius-md: 12rpx;
+  --cure-radius-lg: 20rpx;
+  --cure-radius-xl: 32rpx;
+  --cure-radius-full: 999rpx;
+
+  --cure-font-xs: 20rpx;
+  --cure-font-sm: 24rpx;
+  --cure-font-md: 28rpx;
+  --cure-font-lg: 32rpx;
+  --cure-font-xl: 36rpx;
+  --cure-font-xxl: 48rpx;
+
+  --cure-shadow-sm: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+  --cure-shadow-md: 0 4rpx 16rpx rgba(0, 0, 0, 0.08);
+  --cure-shadow-lg: 0 8rpx 32rpx rgba(0, 0, 0, 0.12);
+
+  background-color: var(--color-bg);
+  color: var(--color-text-regular);
+  font-size: 28rpx;
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue',
+    'PingFang SC', 'Microsoft YaHei', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── 通用容器 ───────────────────────────────────────── */
+.container {
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+.page-content {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* ── Flex 工具类 ────────────────────────────────────── */
+.flex { display: flex; }
+.flex-col { display: flex; flex-direction: column; }
+.flex-center { display: flex; align-items: center; justify-content: center; }
+.flex-between { display: flex; align-items: center; justify-content: space-between; }
+.flex-start { display: flex; align-items: center; justify-content: flex-start; }
+.flex-end { display: flex; align-items: center; justify-content: flex-end; }
+.flex-wrap { flex-wrap: wrap; }
+.flex-1 { flex: 1; min-width: 0; }
+.items-center { align-items: center; }
+.justify-center { justify-content: center; }
+.justify-between { justify-content: space-between; }
+
+/* ── 文字工具类 ─────────────────────────────────────── */
+.text-primary { color: var(--color-primary); }
+.text-danger { color: var(--color-danger); }
+.text-success { color: var(--color-success); }
+.text-secondary { color: var(--color-text-secondary); }
+.text-placeholder { color: var(--color-text-placeholder); }
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+.text-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.text-ellipsis-2 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── 价格样式 ───────────────────────────────────────── */
+.price-symbol { font-size: 22rpx; font-weight: 500; }
+.price-integer { font-size: 36rpx; font-weight: 700; line-height: 1; }
+.price-decimal { font-size: 22rpx; font-weight: 500; }
+.price-original {
+  font-size: 22rpx;
+  color: var(--color-text-placeholder);
+  text-decoration: line-through;
+}
+
+/* ── 卡片 ───────────────────────────────────────────── */
+.card {
+  background: var(--color-card);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-md);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ── 安全区适配 ──────────────────────────────────────── */
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.safe-bottom-fixed {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding-bottom: env(safe-area-inset-bottom);
+  z-index: 100;
+}
+
+/* ── 分割线 ─────────────────────────────────────────── */
+.divider {
+  height: 1rpx;
+  background: var(--color-border-light);
+}
+
+.divider-block {
+  height: 20rpx;
+  background: var(--color-bg);
+}
+
+/* ── 按钮 ───────────────────────────────────────────── */
+.btn-primary {
+  background: var(--color-primary);
+  color: #fff;
+  border-radius: var(--radius-round);
+  text-align: center;
+  font-size: 28rpx;
+  font-weight: 500;
+  border: none;
+}
+
+.btn-primary::after { border: none; }
+
+/* ── 标签 ───────────────────────────────────────────── */
+.tag-hot {
+  display: inline-block;
+  font-size: 18rpx;
+  color: #fff;
+  background: var(--color-primary);
+  border-radius: 4rpx;
+  padding: 2rpx 8rpx;
+  line-height: 1.4;
+}
+
+.tag-new {
+  display: inline-block;
+  font-size: 18rpx;
+  color: #fff;
+  background: var(--color-info);
+  border-radius: 4rpx;
+  padding: 2rpx 8rpx;
+  line-height: 1.4;
+}
+
+/* ── 骨架屏 ─────────────────────────────────────────── */
+.skeleton-block {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+  border-radius: 8rpx;
+}
+
+@keyframes skeleton-loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ── 动画 ───────────────────────────────────────────── */
+.fade-in {
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20rpx); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── 空状态 ─────────────────────────────────────────── */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 120rpx 0;
+}
+
+.empty-state__icon {
+  width: 200rpx;
+  height: 200rpx;
+  margin-bottom: 32rpx;
+  opacity: 0.4;
+}
+
+.empty-state__text {
+  font-size: 28rpx;
+  color: var(--color-text-placeholder);
+  margin-bottom: 32rpx;
+}
+
+/* ── 滚动容器 ───────────────────────────────────────── */
+.scroll-container {
+  height: 100vh;
+  box-sizing: border-box;
+}
+
+/* ── 底部安全区占位 ──────────────────────────────────── */
+.bottom-placeholder {
+  height: calc(100rpx + env(safe-area-inset-bottom));
+}
+
+/* ── Cure utility classes (used by member/order-now/etc pages) ── */
+
+.cure-page {
+  min-height: 100vh;
+  background: var(--cure-bg-page);
+}
+
+.cure-card {
+  background: var(--cure-bg-card);
+  border-radius: var(--cure-radius-lg);
+  padding: var(--cure-spacing-lg);
+  box-shadow: var(--cure-shadow-sm);
+  margin-bottom: var(--cure-spacing-md);
+}
+
+.cure-flex-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.cure-flex-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.cure-flex-between {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cure-flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cure-flex-1 {
+  flex: 1;
+  min-width: 0;
+}
+
+.cure-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cure-ellipsis-2 {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.cure-price {
+  color: var(--cure-primary);
+  font-weight: 600;
+}
+
+.cure-price-symbol {
+  font-size: var(--cure-font-sm);
+}
+
+.cure-price-integer {
+  font-size: var(--cure-font-xl);
+}
+
+.cure-price-original {
+  color: var(--cure-text-placeholder);
+  font-size: var(--cure-font-sm);
+  text-decoration: line-through;
+  margin-left: 8rpx;
+}
+
+.cure-section-title {
+  font-size: var(--cure-font-lg);
+  font-weight: 600;
+  color: var(--cure-text-primary);
+  padding: var(--cure-spacing-lg) var(--cure-spacing-lg) var(--cure-spacing-sm);
+}
+
+.cure-safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.cure-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80rpx 0;
+  color: var(--cure-text-placeholder);
+  font-size: var(--cure-font-sm);
+}
+
+.cure-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 120rpx 0;
+  color: var(--cure-text-placeholder);
+}

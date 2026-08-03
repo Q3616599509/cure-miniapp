@@ -1,0 +1,37 @@
+<!-- pages/settings/settings.wxml -->
+<view class="settings-page">
+  <!-- General Settings -->
+  <view class="section-label">通用</view>
+  <t-cell-group theme="card">
+    <t-cell title="清除缓存" note="{{cacheSize}}" arrow hover bindtap="onClearCache" left-icon="delete" />
+    <t-cell title="检查更新" note="v{{version}}" arrow hover bindtap="onCheckUpdate" left-icon="refresh" />
+    <t-cell title="关于 Cure" arrow hover bindtap="onAboutTap" left-icon="info-circle" />
+  </t-cell-group>
+
+  <!-- Privacy & Security -->
+  <view class="section-label">隐私与安全</view>
+  <t-cell-group theme="card">
+    <t-cell title="隐私政策" arrow hover bindtap="onPrivacyTap" left-icon="lock-on" />
+    <t-cell title="用户协议" arrow hover left-icon="file" bindtap="onPrivacyTap" />
+  </t-cell-group>
+
+  <!-- Other -->
+  <view class="section-label">其他</view>
+  <t-cell-group theme="card">
+    <t-cell title="联系客服" arrow hover left-icon="service" bindtap="onPrivacyTap" />
+    <t-cell title="意见反馈" arrow hover left-icon="chat" bindtap="onPrivacyTap" />
+  </t-cell-group>
+
+  <!-- Logout -->
+  <view class="logout-section" wx:if="{{isLoggedIn}}">
+    <t-button theme="danger" variant="outline" block bindtap="onLogout">
+      退出登录
+    </t-button>
+  </view>
+
+  <!-- Footer -->
+  <view class="footer">
+    <text class="footer-version">Cure v{{version}}</text>
+    <text class="footer-copyright">© 2026 Cure. All rights reserved.</text>
+  </view>
+</view>

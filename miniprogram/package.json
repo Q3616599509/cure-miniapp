@@ -1,0 +1,9 @@
+{
+  "name": "cure-miniprogram",
+  "version": "1.0.0",
+  "description": "Cure 治愈优选微信小程序",
+  "private": true,
+  "dependencies": {
+    "tdesign-miniprogram": "^1.7.0"
+  }
+}

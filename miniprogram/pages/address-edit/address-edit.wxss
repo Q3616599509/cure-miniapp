@@ -1,0 +1,74 @@
+/* pages/address-edit/address-edit.wxss */
+.edit-page {
+  min-height: 100vh;
+  background: var(--cure-bg-page);
+  padding: 16rpx 24rpx 140rpx;
+}
+
+.region-text {
+  color: var(--cure-text-primary);
+  font-size: 28rpx;
+}
+
+.region-placeholder {
+  color: var(--cure-text-placeholder);
+  font-size: 28rpx;
+}
+
+.default-section {
+  margin-top: 24rpx;
+}
+
+.save-btn-wrap {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 24rpx 32rpx;
+  background: #fff;
+  box-shadow: 0 -4rpx 16rpx rgba(0, 0, 0, 0.06);
+  z-index: 90;
+}
+
+/* ── Region Picker ── */
+.region-picker {
+  background: #fff;
+  max-height: 70vh;
+}
+
+.region-picker-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24rpx 32rpx;
+  border-bottom: 1rpx solid var(--cure-border);
+}
+
+.region-cancel {
+  font-size: 28rpx;
+  color: var(--cure-text-secondary);
+}
+
+.region-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: var(--cure-text-primary);
+}
+
+.region-confirm {
+  font-size: 28rpx;
+  color: var(--cure-primary);
+  font-weight: 500;
+}
+
+.region-picker-view {
+  height: 480rpx;
+}
+
+.region-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;
+  color: var(--cure-text-primary);
+}

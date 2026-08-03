@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+server/node_modules/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+server/data/
+
+# Uploads (user uploaded images)
+server/uploads/
+
+# Environment
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# WeChat Mini Program
+miniprogram/miniprogram_npm/
+miniprogram/.cache/
+
+# WorkBuddy
+.workbuddy/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store

@@ -1,0 +1,78 @@
+<!-- pages/favorites/favorites.wxml -->
+<view class="fav-page">
+  <!-- Not logged in -->
+  <view class="not-logged-in" wx:if="{{!isLoggedIn}}">
+    <view class="login-prompt">
+      <view class="login-icon">❤️</view>
+      <view class="login-title">登录后查看收藏</view>
+      <t-button theme="primary" bindtap="onLoginTap" style="margin-top: 32rpx; width: 320rpx;">去登录</t-button>
+    </view>
+  </view>
+
+  <block wx:else>
+    <!-- Loading -->
+    <view class="loading-wrap" wx:if="{{loading}}">
+      <t-loading theme="circular" size="40rpx" text="加载中..." />
+    </view>
+
+    <!-- Empty State -->
+    <view class="empty-wrap" wx:elif="{{favorites.length === 0}}">
+      <t-empty icon="heart" description="还没有收藏商品">
+        <view slot="action">
+          <t-button theme="primary" bindtap="goShopping" style="width: 280rpx; margin-top: 24rpx;">去逛逛</t-button>
+        </view>
+      </t-empty>
+    </view>
+
+    <!-- Favorites Grid -->
+    <block wx:else>
+      <!-- Manage Bar -->
+      <view class="manage-bar">
+        <text class="fav-count">共{{favorites.length}}件收藏</text>
+        <text class="manage-btn" bindtap="onManageTap">{{manageMode ? '完成' : '管理'}}</text>
+      </view>
+
+      <!-- Product Grid -->
+      <view class="product-grid">
+        <view class="product-card {{manageMode ? 'manage' : ''}}"
+          wx:for="{{favorites}}" wx:key="product_id"
+          data-id="{{item.product_id}}"
+          bindtap="onProductTap">
+          <!-- Selection checkbox (manage mode) -->
+          <view class="select-icon {{item.isSelected ? 'selected' : ''}}" wx:if="{{manageMode}}">
+            <t-icon name="check" size="28rpx" color="#fff" wx:if="{{item.isSelected}}" />
+          </view>
+
+          <image class="product-img" src="{{item.image}}" mode="aspectFill" lazy-load="true" />
+          <view class="product-info">
+            <view class="product-name cure-ellipsis-2">{{item.product_name}}</view>
+            <view class="product-bottom">
+              <view class="product-price-wrap">
+                <text class="cure-price"><text class="cure-price-symbol">¥</text><text class="cure-price-integer">{{item.displayPrice}}</text></text>
+                <text class="cure-price-original" wx:if="{{item.originalPrice}}">¥{{item.originalPrice}}</text>
+              </view>
+              <view class="product-sales">{{item.salesText}}</view>
+            </view>
+            <!-- Unfavorite button (normal mode) -->
+            <view class="unfav-btn" wx:if="{{!manageMode}}" data-id="{{item.product_id}}" catchtap="onUnfavorite">
+              <t-icon name="heart-filled" size="32rpx" color="#FF4D4F" />
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <!-- Bottom Action Bar (manage mode) -->
+      <view class="bottom-action cure-safe-bottom" wx:if="{{manageMode}}">
+        <view class="select-all-btn" bindtap="onSelectAll">
+          <view class="select-icon {{selectedIds.length === favorites.length ? 'selected' : ''}}">
+            <t-icon name="check" size="28rpx" color="#fff" wx:if="{{selectedIds.length === favorites.length}}" />
+          </view>
+          <text>全选</text>
+        </view>
+        <t-button theme="danger" size="small" disabled="{{selectedIds.length === 0}}" bindtap="onBatchUnfavorite">
+          {{batchDeleteText}}
+        </t-button>
+      </view>
+    </block>
+  </block>
+</view>

@@ -1,0 +1,192 @@
+<!--pages/index/index.wxml — 首页-->
+<view class="home">
+
+  <!-- ═══ 自定义导航栏 + 搜索栏 ═══ -->
+  <view class="nav-bar" style="padding-top: {{statusBarHeight}}px;">
+    <view class="nav-bar__content">
+      <view class="nav-bar__logo">Cure</view>
+      <view class="nav-bar__search" bindtap="onSearchTap">
+        <t-icon name="search" size="32rpx" color="#999" />
+        <text class="nav-bar__search-text">搜索商品、品牌</text>
+      </view>
+      <view class="nav-bar__scan" bindtap="onScanTap">
+        <t-icon name="scan" size="44rpx" color="#333" />
+      </view>
+    </view>
+  </view>
+
+  <!-- 占位高度 -->
+  <view style="height: {{navBarHeight}}px;"></view>
+
+  <!-- 滚动内容 -->
+  <scroll-view scroll-y class="home-scroll" enhanced show-scrollbar="{{false}}">
+
+    <!-- ═══ Banner 轮播 ═══ -->
+    <view class="banner-section">
+      <swiper
+        class="banner-swiper"
+        autoplay
+        circular
+        interval="4000"
+        duration="500"
+        indicator-dots
+        indicator-color="rgba(255,255,255,0.4)"
+        indicator-active-color="#FF5C39"
+        bindchange="onBannerChange"
+      >
+        <swiper-item wx:for="{{banners}}" wx:key="id">
+          <view class="banner-item" data-id="{{item.id}}" bindtap="onBannerTap">
+            <t-image
+              src="{{item.image}}"
+              mode="aspectFill"
+              width="100%"
+              height="320rpx"
+              shape="round"
+              lazy
+              error="slot"
+            >
+              <view slot="error" class="image-fallback">
+                <t-icon name="image" size="48rpx" color="#C8C8C8" />
+              </view>
+            </t-image>
+          </view>
+        </swiper-item>
+      </swiper>
+    </view>
+
+    <!-- ═══ 品类导航 金刚区 ═══ -->
+    <view class="category-section card">
+      <view class="category-grid">
+        <view
+          wx:for="{{categories}}"
+          wx:key="id"
+          class="category-item"
+          data-id="{{item.id}}"
+          bindtap="onCategoryTap"
+        >
+          <view class="category-item__icon">{{item.icon}}</view>
+          <text class="category-item__name">{{item.name}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- ═══ 限时抢购 ═══ -->
+    <view class="flash-sale-section card" wx:if="{{flashSaleProducts.length}}">
+      <view class="section-header">
+        <view class="section-header__left">
+          <text class="section-header__title">⚡ 限时抢购</text>
+          <view class="countdown">
+            <text class="countdown__box">{{countdown.hours}}</text>
+            <text class="countdown__colon">:</text>
+            <text class="countdown__box">{{countdown.minutes}}</text>
+            <text class="countdown__colon">:</text>
+            <text class="countdown__box">{{countdown.seconds}}</text>
+          </view>
+        </view>
+      </view>
+      <scroll-view scroll-x class="flash-sale-scroll" enhanced show-scrollbar="{{false}}">
+        <view class="flash-sale-list">
+          <view
+            wx:for="{{flashSaleProducts}}"
+            wx:key="id"
+            class="flash-sale-item"
+            data-id="{{item.id}}"
+            bindtap="onFlashSaleTap"
+          >
+            <t-image
+              src="{{item.images[0] || '/assets/product-placeholder.png'}}"
+              mode="aspectFill"
+              width="180rpx"
+              height="180rpx"
+              shape="round"
+              lazy
+              error="slot"
+            >
+              <view slot="error" class="image-fallback image-fallback--small">
+                <t-icon name="image" size="40rpx" color="#C8C8C8" />
+              </view>
+            </t-image>
+            <text class="flash-sale-item__name text-ellipsis">{{item.name}}</text>
+            <view class="flash-sale-item__price">
+              <text class="price-symbol">¥</text>
+              <text class="flash-sale-item__price-num">{{item.sale_price}}</text>
+              <text class="price-original">¥{{item.price}}</text>
+            </view>
+          </view>
+        </view>
+      </scroll-view>
+    </view>
+
+    <!-- ═══ 热销推荐 ═══ -->
+    <view class="hot-section">
+      <view class="section-header">
+        <view class="section-header__title-wrap">
+          <view class="section-header__bar"></view>
+          <text class="section-header__title">热销推荐</text>
+        </view>
+        <text class="section-header__more">查看更多 ›</text>
+      </view>
+
+      <!-- 骨架屏 -->
+      <view class="product-grid" wx:if="{{loading}}">
+        <view class="product-card" wx:for="{{[1,2,3,4]}}" wx:key="*this">
+          <view class="skeleton-block" style="width:100%;height:340rpx;border-radius:16rpx;"></view>
+          <view class="skeleton-block" style="width:80%;height:32rpx;margin-top:16rpx;border-radius:8rpx;"></view>
+          <view class="skeleton-block" style="width:50%;height:32rpx;margin-top:8rpx;border-radius:8rpx;"></view>
+        </view>
+      </view>
+
+      <!-- 商品列表 -->
+      <view class="product-grid" wx:else>
+        <view
+          wx:for="{{hotProducts}}"
+          wx:key="id"
+          class="product-card"
+          data-id="{{item.id}}"
+          bindtap="onProductTap"
+        >
+          <view class="product-card__image-wrap">
+            <image
+              class="product-card__image"
+              src="{{item.images[0] || '/assets/product-placeholder.png'}}"
+              mode="aspectFill"
+              lazy-load="{{true}}"
+              binderror="onProductImageError"
+              data-index="{{index}}"
+            />
+            <view class="product-card__tags" wx:if="{{item.is_hot || item.is_new}}">
+              <text class="tag-hot" wx:if="{{item.is_hot}}">HOT</text>
+              <text class="tag-new" wx:if="{{item.is_new}}">NEW</text>
+            </view>
+          </view>
+          <view class="product-card__info">
+            <text class="product-card__name text-ellipsis-2">{{item.name}}</text>
+            <view class="product-card__bottom">
+              <view class="product-card__price">
+                <text class="price-symbol text-primary">¥</text>
+                <text class="price-integer text-primary">{{item.sale_price}}</text>
+                <text class="price-original" wx:if="{{item.price > item.sale_price}}">¥{{item.price}}</text>
+              </view>
+              <text class="product-card__sales">已售{{item.sales}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 加载更多 -->
+      <view class="load-more" wx:if="{{!loading}}">
+        <t-loading wx:if="{{loadingMore}}" theme="circular" size="40rpx" text="加载中..." />
+        <text wx:elif="{{!hasMore}}" class="load-more__text">— 已经到底啦 —</text>
+      </view>
+    </view>
+
+    <!-- 底部占位 -->
+    <view class="bottom-placeholder"></view>
+  </scroll-view>
+
+  <!-- ═══ 悬浮购物车入口 ═══ -->
+  <view class="float-cart" bindtap="onCartTap" wx:if="{{cartCount > 0}}">
+    <t-icon name="cart" size="48rpx" color="#fff" />
+    <view class="float-cart__badge">{{cartCount}}</view>
+  </view>
+</view>

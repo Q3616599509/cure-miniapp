@@ -1,0 +1,129 @@
+<!-- pages/checkout/checkout.wxml -->
+<view class="checkout-page">
+
+  <!-- Payment Success Overlay -->
+  <view class="success-overlay" wx:if="{{paymentSuccess}}">
+    <view class="success-card">
+      <view class="success-icon">✅</view>
+      <view class="success-title">支付成功</view>
+      <view class="success-amount">¥{{payAmount}}</view>
+      <view class="success-info">
+        <text>订单号：{{paidOrderNo}}</text>
+      </view>
+      <view class="success-steps">
+        <view class="step" wx:if="{{store}}">
+          <text class="step-tag">取餐门店</text>
+          <text class="step-text">{{store.name}}</text>
+        </view>
+        <view class="step">
+          <text class="step-tag">取餐时间</text>
+          <text class="step-text">到店即取，请出示取餐码</text>
+        </view>
+      </view>
+      <view class="success-actions">
+        <t-button theme="primary" size="large" block bindtap="onBackToHome">返回首页</t-button>
+        <t-button theme="light" size="large" block bindtap="onViewOrder" style="margin-top: 16rpx;">查看订单</t-button>
+      </view>
+    </view>
+  </view>
+
+  <!-- Custom Nav Bar -->
+  <view class="nav-bar" style="padding-top: {{statusBarHeight}}px;">
+    <view class="nav-bar-content">
+      <view class="nav-back" bindtap="onBack">
+        <t-icon name="chevron-left" size="42rpx" color="#333" />
+      </view>
+      <view class="nav-title">确认订单</view>
+    </view>
+  </view>
+  <view style="height: {{statusBarHeight + 44}}px;"></view>
+
+  <!-- Store Info -->
+  <view class="section" wx:if="{{store}}">
+    <view class="section-head">
+      <t-icon name="location" size="28rpx" color="#835C45" />
+      <text>取餐门店</text>
+    </view>
+    <view class="store-row">
+      <text class="store-name">{{store.name}}</text>
+      <text class="store-addr">{{store.address}}</text>
+    </view>
+  </view>
+
+  <!-- Order Items -->
+  <view class="section">
+    <view class="section-head">
+      <t-icon name="cart" size="28rpx" color="#835C45" />
+      <text>订单商品</text>
+    </view>
+    <view class="item" wx:for="{{items}}" wx:key="cartId">
+      <image class="item-img" src="{{item.image}}" mode="aspectFill" />
+      <view class="item-info">
+        <view class="item-name cure-ellipsis-2">{{item.name}}</view>
+        <view class="item-spec" wx:if="{{item.specText}}">{{item.specText}}</view>
+        <view class="item-bottom">
+          <view class="item-price cure-price">
+            <text class="cure-price-symbol">¥</text><text>{{item.price}}</text>
+          </view>
+          <view class="item-qty">x{{item.quantity}}</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- Price Breakdown -->
+  <view class="section">
+    <view class="price-row">
+      <text>商品小计</text>
+      <text>¥{{subtotal}}</text>
+    </view>
+    <view class="price-row" wx:if="{{memberDiscount !== '0.00'}}">
+      <text>会员优惠（{{memberLevelText}}）</text>
+      <text class="price-discount">{{memberDiscount}}</text>
+    </view>
+    <view class="price-row price-total">
+      <text>实付金额</text>
+      <text class="cure-price cure-price-large">
+        <text class="cure-price-symbol">¥</text><text class="cure-price-integer">{{payAmount}}</text>
+      </text>
+    </view>
+  </view>
+
+  <!-- Remark -->
+  <view class="section">
+    <view class="section-head">
+      <t-icon name="edit" size="28rpx" color="#835C45" />
+      <text>备注</text>
+    </view>
+    <t-textarea
+      placeholder="选填，如：少糖、多加冰、不要葱花..."
+      value="{{remark}}"
+      maxlength="100"
+      autosize="{{true}}"
+      bind:change="onRemarkInput"
+    />
+  </view>
+
+  <!-- Bottom Bar -->
+  <view class="bottom-bar cure-safe-bottom">
+    <view class="bottom-total">
+      <text class="bottom-label">实付</text>
+      <view class="cure-price cure-price-large">
+        <text class="cure-price-symbol">¥</text><text class="cure-price-integer">{{payAmount}}</text>
+      </view>
+    </view>
+    <t-button
+      theme="primary"
+      size="large"
+      block
+      loading="{{submitting}}"
+      disabled="{{submitting || paymentSuccess}}"
+      bindtap="onSubmit"
+      style="width: 320rpx; height: 80rpx; line-height: 80rpx; border-radius: 40rpx;">
+      立即支付
+    </t-button>
+  </view>
+
+  <!-- Bottom spacer -->
+  <view style="height: 140rpx;"></view>
+</view>

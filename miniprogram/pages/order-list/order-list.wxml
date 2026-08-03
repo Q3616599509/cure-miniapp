@@ -1,0 +1,122 @@
+<!-- pages/order-list/order-list.wxml — 订单列表页 -->
+<view class="order-list-page">
+
+  <!-- ═══ 状态 Tab 栏 ═══ -->
+  <view class="tabs-bar">
+    <view
+      wx:for="{{tabs}}"
+      wx:key="key"
+      class="tab-item {{activeTab === item.key ? 'tab-item--active' : ''}}"
+      data-index="{{index}}"
+      bindtap="onTabChange"
+    >
+      <text class="tab-item__text">{{item.label}}</text>
+      <view class="tab-item__line" wx:if="{{activeTab === item.key}}"></view>
+    </view>
+  </view>
+
+  <!-- ═══ 订单列表 ═══ -->
+  <view class="order-list" wx:if="{{!loading && orders.length > 0}}">
+
+    <view
+      wx:for="{{orders}}"
+      wx:key="id"
+      class="order-card"
+      data-id="{{item.id}}"
+      bindtap="goToDetail"
+    >
+      <!-- 卡片头部：订单号 + 状态 -->
+      <view class="order-card__header">
+        <text class="order-card__no">订单号：{{item.order_no}}</text>
+        <text class="order-card__status" style="color: {{item.statusColor}};">{{item.statusLabel}}</text>
+      </view>
+
+      <!-- 商品预览 -->
+      <view class="order-card__body">
+        <!-- 图片预览（最多3张横排） -->
+        <view class="order-card__images">
+          <view
+            wx:for="{{item.itemImages}}"
+            wx:for-item="img"
+            wx:key="*this"
+            class="order-card__img-wrap"
+          >
+            <image src="{{img}}" mode="aspectFill" class="order-card__img" lazy-load />
+          </view>
+          <!-- 如果没有图片，显示商品名称 -->
+          <view class="order-card__no-img" wx:if="{{item.itemImages.length === 0}}">
+            <text class="order-card__item-name">{{item.firstItemName}}</text>
+          </view>
+        </view>
+
+        <!-- 价格 & 件数 -->
+        <view class="order-card__summary">
+          <view class="order-card__count">共{{item.itemCount}}件</view>
+          <view class="order-card__price-wrap">
+            <text class="order-card__price-label">实付</text>
+            <text class="price-symbol text-primary">¥</text>
+            <text class="order-card__price text-primary">{{item.pay_amount}}</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 卡片底部操作按钮 -->
+      <view class="order-card__footer" catchtap="noop">
+        <!-- 待付款 -->
+        <block wx:if="{{item.status === 'pending_payment'}}">
+          <view class="order-btn order-btn--outline" data-id="{{item.id}}" catchtap="onCancel">取消订单</view>
+          <view class="order-btn order-btn--primary" data-id="{{item.id}}" catchtap="onPay">立即支付</view>
+        </block>
+
+        <!-- 待发货 -->
+        <block wx:elif="{{item.status === 'paid' || item.status === 'preparing'}}">
+          <view class="order-btn order-btn--outline" data-id="{{item.id}}" catchtap="onCancel">取消订单</view>
+        </block>
+
+        <!-- 待取货/待收货 -->
+        <block wx:elif="{{item.status === 'ready' || item.status === 'shipped' || item.status === 'delivered'}}">
+          <view class="order-btn order-btn--outline" data-id="{{item.id}}" catchtap="onBuyAgain">再次购买</view>
+          <view class="order-btn order-btn--primary" data-id="{{item.id}}" catchtap="onConfirm">确认收货</view>
+        </block>
+
+        <!-- 已完成 -->
+        <block wx:elif="{{item.status === 'completed'}}">
+          <view class="order-btn order-btn--outline" data-id="{{item.id}}" catchtap="onBuyAgain">再次购买</view>
+        </block>
+
+        <!-- 已取消 -->
+        <block wx:elif="{{item.status === 'cancelled'}}">
+          <view class="order-btn order-btn--outline" data-id="{{item.id}}" catchtap="onBuyAgain">再次购买</view>
+        </block>
+      </view>
+    </view>
+
+    <!-- 加载更多 -->
+    <view class="load-more" wx:if="{{loadingMore}}">
+      <t-loading theme="circular" size="40rpx" text="加载中..." />
+    </view>
+
+    <!-- 没有更多 -->
+    <view class="no-more" wx:if="{{!hasMore && orders.length > 0}}">
+      <text class="no-more__text">— 没有更多订单了 —</text>
+    </view>
+  </view>
+
+  <!-- ═══ 加载中 ═══ -->
+  <view class="loading-wrap" wx:if="{{loading}}">
+    <t-loading theme="circular" size="48rpx" text="加载中..." />
+  </view>
+
+  <!-- ═══ 空状态 ═══ -->
+  <view class="empty-wrap" wx:if="{{!loading && orders.length === 0}}">
+    <t-empty
+      icon="order"
+      description="暂无相关订单"
+      size="200"
+    />
+    <view class="empty-tip">快去下单吧~</view>
+  </view>
+
+  <!-- 底部占位 -->
+  <view style="height: 40rpx;"></view>
+</view>

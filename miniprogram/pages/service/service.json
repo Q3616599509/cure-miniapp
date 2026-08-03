@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "智能客服",
+  "navigationBarBackgroundColor": "#ffffff",
+  "navigationBarTextStyle": "black",
+  "usingComponents": {
+    "t-icon": "tdesign-miniprogram/icon/icon",
+    "t-image": "tdesign-miniprogram/image/image"
+  }
+}

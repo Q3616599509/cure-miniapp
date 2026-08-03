@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cure 管理后台 - 治愈优选</title>
+<style>
+:root {
+  --primary: #07C160;
+  --primary-dark: #06AD56;
+  --bg: #f5f6f7;
+  --card: #fff;
+  --text: #1a1a1a;
+  --text-secondary: #666;
+  --text-muted: #999;
+  --border: #e5e7eb;
+  --danger: #e74c3c;
+  --warning: #f39c12;
+  --info: #3498db;
+  --sidebar-w: 240px;
+  --header-h: 60px;
+  --shadow: 0 1px 3px rgba(0,0,0,.08);
+  --radius: 10px;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; background:var(--bg); color:var(--text); display:flex; min-height:100vh; }
+
+/* Sidebar */
+.sidebar { width:var(--sidebar-w); background:#fff; border-right:1px solid var(--border); display:flex; flex-direction:column; position:fixed; top:0; left:0; bottom:0; z-index:100; }
+.sidebar-logo { padding:20px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:12px; }
+.sidebar-logo .logo-icon { width:34px; height:34px; background:var(--primary); border-radius:8px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:18px; font-weight:700; }
+.sidebar-logo h1 { font-size:16px; font-weight:700; color:var(--text); }
+.sidebar-logo span { font-size:11px; color:var(--text-muted); display:block; }
+.sidebar-nav { flex:1; padding:12px 0; overflow-y:auto; }
+.nav-group { margin-bottom:8px; }
+.nav-group-title { padding:8px 20px 4px; font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.5px; }
+.nav-item { display:flex; align-items:center; gap:10px; padding:10px 20px; margin:1px 8px; border-radius:8px; cursor:pointer; font-size:14px; color:var(--text-secondary); transition:all .15s; border:none; background:none; width:calc(100% - 16px); text-align:left; }
+.nav-item:hover { background:#f5f5f5; color:var(--text); }
+.nav-item.active { background:#e8f8ee; color:var(--primary); font-weight:600; }
+.nav-item .icon { font-size:18px; width:20px; text-align:center; }
+.sidebar-footer { padding:12px 20px; border-top:1px solid var(--border); }
+.user-info { display:flex; align-items:center; gap:10px; }
+.user-avatar { width:32px; height:32px; border-radius:50%; background:var(--primary); color:#fff; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:600; }
+.user-name { font-size:13px; font-weight:600; }
+.user-role { font-size:11px; color:var(--text-muted); }
+.logout-btn { margin-top:8px; width:100%; padding:6px; border:1px solid var(--border); border-radius:6px; background:#fff; color:var(--text-secondary); cursor:pointer; font-size:12px; }
+
+/* Main */
+.main { margin-left:var(--sidebar-w); flex:1; display:flex; flex-direction:column; }
+.header { height:var(--header-h); background:#fff; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; padding:0 24px; }
+.header h2 { font-size:18px; font-weight:700; }
+.content { flex:1; padding:24px; overflow-y:auto; }
+
+/* Cards */
+.stats-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; margin-bottom:24px; }
+.stat-card { background:var(--card); border-radius:var(--radius); padding:20px; box-shadow:var(--shadow); }
+.stat-card .label { font-size:13px; color:var(--text-muted); margin-bottom:8px; }
+.stat-card .value { font-size:28px; font-weight:700; }
+.stat-card .sub { font-size:12px; color:var(--text-muted); margin-top:4px; }
+.stat-card .trend { color:var(--primary); font-size:12px; }
+
+.row-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+
+/* Table */
+.table-card { background:var(--card); border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden; margin-bottom:24px; }
+.table-header { display:flex; align-items:center; justify-content:space-between; padding:16px 20px; border-bottom:1px solid var(--border); }
+.table-header h3 { font-size:15px; font-weight:700; }
+.table-actions { display:flex; gap:8px; }
+table { width:100%; border-collapse:collapse; }
+th, td { padding:12px 20px; text-align:left; font-size:13px; border-bottom:1px solid var(--border); }
+th { background:#fafafa; color:var(--text-secondary); font-weight:600; font-size:12px; white-space:nowrap; }
+tr:last-child td { border-bottom:none; }
+tr:hover td { background:#fafafa; }
+
+/* Buttons */
+.btn { padding:6px 14px; border-radius:6px; border:none; cursor:pointer; font-size:13px; font-weight:500; transition:all .15s; display:inline-flex; align-items:center; gap:4px; }
+.btn-primary { background:var(--primary); color:#fff; }
+.btn-primary:hover { background:var(--primary-dark); }
+.btn-outline { background:#fff; border:1px solid var(--border); color:var(--text); }
+.btn-outline:hover { background:#f5f5f5; }
+.btn-danger { background:var(--danger); color:#fff; }
+.btn-danger:hover { background:#c0392b; }
+.btn-sm { padding:4px 10px; font-size:12px; }
+.btn-xs { padding:2px 8px; font-size:11px; }
+
+/* Status badges */
+.badge { padding:2px 8px; border-radius:10px; font-size:11px; font-weight:600; display:inline-block; }
+.badge-success { background:#e8f8ee; color:var(--primary); }
+.badge-warning { background:#fef3e2; color:var(--warning); }
+.badge-danger { background:#fde8e8; color:var(--danger); }
+.badge-info { background:#e3f2fd; color:var(--info); }
+.badge-muted { background:#f0f0f0; color:var(--text-muted); }
+
+/* Modal */
+.modal-overlay { display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,.4); z-index:999; align-items:center; justify-content:center; }
+.modal-overlay.show { display:flex; }
+.modal { background:#fff; border-radius:var(--radius); width:90%; max-width:560px; max-height:80vh; overflow-y:auto; box-shadow:0 10px 40px rgba(0,0,0,.15); }
+.modal-header { padding:16px 20px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+.modal-header h3 { font-size:16px; }
+.modal-body { padding:20px; }
+.modal-footer { padding:12px 20px; border-top:1px solid var(--border); display:flex; justify-content:flex-end; gap:8px; }
+
+/* Form */
+.form-group { margin-bottom:16px; }
+.form-group label { display:block; font-size:13px; font-weight:600; color:var(--text-secondary); margin-bottom:6px; }
+.form-group input, .form-group select, .form-group textarea { width:100%; padding:8px 12px; border:1px solid var(--border); border-radius:6px; font-size:13px; outline:none; transition:border-color .15s; }
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color:var(--primary); }
+.form-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+
+/* Search bar */
+.search-bar { display:flex; gap:8px; }
+.search-bar input { padding:6px 12px; border:1px solid var(--border); border-radius:6px; font-size:13px; outline:none; width:200px; }
+.search-bar input:focus { border-color:var(--primary); }
+
+/* Pagination */
+.pagination { display:flex; justify-content:center; gap:6px; padding:16px; }
+.pagination button { padding:6px 12px; border:1px solid var(--border); border-radius:6px; background:#fff; cursor:pointer; font-size:13px; }
+.pagination button.active { background:var(--primary); color:#fff; border-color:var(--primary); }
+.pagination button:disabled { opacity:.5; cursor:default; }
+
+/* Login page */
+.login-page { min-height:100vh; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg,#e8f8ee 0%,#d4f5e0 100%); }
+.login-card { background:#fff; border-radius:var(--radius); padding:40px; width:380px; box-shadow:0 10px 40px rgba(0,0,0,.1); text-align:center; }
+.login-card .logo { width:60px; height:60px; background:var(--primary); border-radius:16px; margin:0 auto 16px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:28px; font-weight:700; }
+.login-card h2 { font-size:20px; margin-bottom:4px; }
+.login-card p { font-size:13px; color:var(--text-muted); margin-bottom:24px; }
+.login-card input { width:100%; padding:10px 14px; border:1px solid var(--border); border-radius:8px; font-size:14px; margin-bottom:12px; outline:none; }
+.login-card input:focus { border-color:var(--primary); }
+.login-card .login-btn { width:100%; padding:10px; background:var(--primary); color:#fff; border:none; border-radius:8px; font-size:15px; font-weight:600; cursor:pointer; margin-top:8px; }
+.login-card .login-btn:hover { background:var(--primary-dark); }
+
+/* Empty state */
+.empty { text-align:center; padding:40px; color:var(--text-muted); font-size:14px; }
+
+/* Loading */
+.loading { text-align:center; padding:20px; color:var(--text-muted); }
+
+/* Hidden */
+.hidden { display:none !important; }
+
+/* Map placeholder */
+/* Role badge colors */
+.role-super_admin { background:#fce4ec; color:#c62828; }
+.role-admin { background:#e8eaf6; color:#283593; }
+.role-store_manager { background:#fff3e0; color:#e65100; }
+.role-operator { background:#e0f2f1; color:#00695c; }
+.role-user { background:#f5f5f5; color:#616161; }
+
+@media (max-width:768px) {
+  .sidebar { display:none; }
+  .main { margin-left:0; }
+  .row-grid { grid-template-columns:1fr; }
+}
+.map-container { width:100%; height:220px; border-radius:8px; overflow:hidden; margin-bottom:16px; background:#f0f0f0; }
+.map-hint { font-size:12px; color:var(--text-muted); margin-bottom:12px; }
+</style>
+<!-- 腾讯地图 GL JS（请在腾讯位置服务控制台申请 key 后替换 YOUR_TENCENT_MAP_KEY） -->
+<script src="https://map.qq.com/api/gljs?v=1.exp&key=YOUR_TENCENT_MAP_KEY"></script>
+</head>
+<body>
+
+<!-- Login Page -->
+<div id="loginPage" class="login-page">
+  <div class="login-card">
+    <div class="logo">C</div>
+    <h2>Cure 管理后台</h2>
+    <p>治愈优选 · 管理员登录</p>
+    <input id="loginUsername" type="text" placeholder="请输入管理员账号" autocomplete="off">
+    <input id="loginPassword" type="password" placeholder="请输入密码">
+    <div id="loginError" style="color:var(--danger);font-size:12px;margin-bottom:8px;display:none;"></div>
+    <button class="login-btn" onclick="doLogin()">登 录</button>
+    <p style="font-size:11px;color:var(--text-muted);margin-top:12px;">
+      开发环境：使用任意管理员昵称即可登录<br>
+      首次使用请先通过小程序注册，然后由超级管理员授予权限
+    </p>
+  </div>
+</div>
+
+<!-- Main App -->
+<div id="mainApp" style="display:none;">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">C</div>
+      <div><h1>Cure Admin</h1><span>治愈优选管理后台</span></div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-group">
+        <div class="nav-group-title">概览</div>
+        <button class="nav-item active" data-page="dashboard" onclick="switchPage('dashboard',this)">
+          <span class="icon">📊</span> 数据概览
+        </button>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-title">业务管理</div>
+        <button class="nav-item" data-page="stores" onclick="switchPage('stores',this)">
+          <span class="icon">🏪</span> 门店管理
+        </button>
+        <button class="nav-item" data-page="orders" onclick="switchPage('orders',this)">
+          <span class="icon">📋</span> 订单管理
+        </button>
+        <button class="nav-item" data-page="products" onclick="switchPage('products',this)">
+          <span class="icon">📦</span> 商品管理
+        </button>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-title">系统管理</div>
+        <button class="nav-item" data-page="users" onclick="switchPage('users',this)">
+          <span class="icon">👥</span> 用户管理
+        </button>
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar" id="adminAvatar">A</div>
+        <div>
+          <div class="user-name" id="adminName">管理员</div>
+          <div class="user-role" id="adminRole"></div>
+        </div>
+      </div>
+      <button class="logout-btn" onclick="doLogout()">退出登录</button>
+    </div>
+  </aside>
+
+  <div class="main">
+    <div class="header"><h2 id="pageTitle">数据概览</h2></div>
+    <div class="content" id="pageContent"></div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modalBox"></div>
+</div>
+
+<script>
+// ============ State ============
+const API = '/admin';
+let token = localStorage.getItem('cure_admin_token');
+let currentUser = null;
+let currentPage = 'dashboard';
+
+// ============ Init ============
+if (token) {
+  fetchProfile();
+} else {
+  document.getElementById('loginPage').style.display = 'flex';
+}
+
+// 重命名为 apiFetch，避免与全局 window.fetch 冲突
+async function apiFetch(url, opts = {}) {
+  const headers = { 'Content-Type': 'application/json', ...opts.headers };
+  if (token) headers['Authorization'] = 'Bearer ' + token;
+  const res = await window.fetch(url, { ...opts, headers });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    if (res.status === 401) { doLogout(); throw new Error('登录过期'); }
+    throw new Error(data.message || '请求失败');
+  }
+  return data;
+}
+
+// ============ Auth ============
+async function doLogin() {
+  const username = document.getElementById('loginUsername').value.trim();
+  const password = document.getElementById('loginPassword').value.trim();
+  const errEl = document.getElementById('loginError');
+  if (!username) { errEl.textContent = '请输入账号'; errEl.style.display = 'block'; return; }
+
+  try {
+    const data = await apiFetch(API + '/login', { method: 'POST', body: JSON.stringify({ username, password }) });
+    token = data.data.token;
+    currentUser = data.data.user;
+    localStorage.setItem('cure_admin_token', token);
+    document.getElementById('loginPage').style.display = 'none';
+    const mainApp = document.getElementById('mainApp');
+    mainApp.style.display = 'flex';
+    mainApp.classList.remove('hidden');
+    updateSidebar();
+    switchPage('dashboard');
+  } catch (e) {
+    errEl.textContent = e.message;
+    errEl.style.display = 'block';
+  }
+}
+
+function doLogout() {
+  token = null; currentUser = null;
+  localStorage.removeItem('cure_admin_token');
+  document.getElementById('loginPage').style.display = 'flex';
+  document.getElementById('mainApp').style.display = 'none';
+}
+
+async function fetchProfile() {
+  try {
+    const data = await apiFetch(API + '/profile');
+    currentUser = data.data;
+    document.getElementById('loginPage').style.display = 'none';
+    document.getElementById('mainApp').style.display = 'flex';
+    updateSidebar();
+    switchPage('dashboard');
+  } catch (e) { doLogout(); }
+}
+
+function updateSidebar() {
+  if (!currentUser) return;
+  document.getElementById('adminAvatar').textContent = (currentUser.nickname || 'A')[0].toUpperCase();
+  document.getElementById('adminName').textContent = currentUser.nickname || '管理员';
+  const roleMap = { super_admin:'超级管理员', admin:'管理员', store_manager:'门店经理', operator:'运营人员' };
+  document.getElementById('adminRole').textContent = roleMap[currentUser.role] || currentUser.role;
+
+  // Hide super admin menu for non-super-admin
+  const roleLevel = { super_admin:4, admin:3, store_manager:2, operator:1 };
+  const userLevel = roleLevel[currentUser.role] || 0;
+  document.querySelectorAll('[data-page="users"]')[0].parentElement.style.display = userLevel >= 3 ? '' : 'none';
+}
+
+function switchPage(page, btn) {
+  currentPage = page;
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  else document.querySelector(`[data-page="${page}"]`)?.classList.add('active');
+
+  const titles = { dashboard:'数据概览', stores:'门店管理', orders:'订单管理', products:'商品管理', users:'用户管理' };
+  document.getElementById('pageTitle').textContent = titles[page] || '';
+
+  switch (page) {
+    case 'dashboard': loadDashboard(); break;
+    case 'stores': loadStores(); break;
+    case 'orders': loadOrders(); break;
+    case 'products': loadProducts(); break;
+    case 'users': loadUsers(); break;
+  }
+}
+
+// ============ Dashboard ============
+async function loadDashboard() {
+  try {
+    const data = await apiFetch(API + '/dashboard');
+    const s = data.data;
+
+    const statusLabels = {
+      pending_payment:'待付款', paid:'已支付', preparing:'制作中', ready:'待取餐',
+      delivering:'配送中', completed:'已完成', cancelled:'已取消'
+    };
+    const statusColors = {
+      pending_payment:'badge-warning', paid:'badge-info', preparing:'badge-info',
+      ready:'badge-success', delivering:'badge-info', completed:'badge-success', cancelled:'badge-muted'
+    };
+
+    let statusHtml = (s.statusDist || []).map(d =>
+      `<span class="badge ${statusColors[d.status]||'badge-muted'}">${statusLabels[d.status]||d.status}: ${d.count}</span>`
+    ).join(' ') || '';
+
+    let storesHtml = (s.topStores || []).map(st =>
+      `<tr><td>${st.name||'--'}</td><td>${st.order_count}</td><td>¥${(st.revenue||0).toFixed(2)}</td></tr>`
+    ).join('') || '<tr><td colspan="3" class="empty">暂无数据</td></tr>';
+
+    document.getElementById('pageContent').innerHTML = `
+      <div class="stats-grid">
+        <div class="stat-card"><div class="label">总用户数</div><div class="value">${s.total_users||0}</div></div>
+        <div class="stat-card"><div class="label">总订单数</div><div class="value">${s.total_orders||0}</div></div>
+        <div class="stat-card"><div class="label">总营收</div><div class="value">¥${(s.total_revenue||0).toFixed(2)}</div></div>
+        <div class="stat-card"><div class="label">今日订单</div><div class="value">${s.today_orders||0}<span class="trend"> 今日营收 ¥${(s.today_revenue||0).toFixed(2)}</span></div></div>
+        <div class="stat-card"><div class="label">商品数量</div><div class="value">${s.total_products||0}</div></div>
+        <div class="stat-card"><div class="label">门店数量</div><div class="value">${s.total_stores||0}</div></div>
+      </div>
+
+      <div class="row-grid">
+        <div class="table-card">
+          <div class="table-header"><h3>订单状态分布</h3></div>
+          <div style="padding:16px 20px;display:flex;flex-wrap:wrap;gap:6px;">${statusHtml}</div>
+        </div>
+        <div class="table-card">
+          <div class="table-header"><h3>门店订单排行</h3></div>
+          <table><thead><tr><th>门店</th><th>订单数</th><th>营收</th></tr></thead>
+          <tbody>${storesHtml}</tbody></table>
+        </div>
+      </div>
+    `;
+  } catch (e) {
+    document.getElementById('pageContent').innerHTML = `<div class="empty">加载失败: ${e.message}</div>`;
+  }
+}
+
+// ============ Stores ============
+async function loadStores() {
+  try {
+    const data = await apiFetch(API + '/stores');
+    const stores = data.data;
+
+    const rows = stores.map(s => `
+      <tr>
+        <td>${s.id}</td>
+        <td><strong>${s.name}</strong></td>
+        <td>${s.city||''} ${s.district||''}</td>
+        <td>${s.address}</td>
+        <td><span class="badge ${s.status===1?'badge-success':'badge-muted'}">${s.status===1?'营业中':'已停用'}</span></td>
+        <td>${s.order_count||0}</td>
+        <td>
+          <button class="btn btn-outline btn-xs" onclick="editStore(${s.id})">编辑</button>
+          ${s.status===1
+            ? `<button class="btn btn-warning btn-xs" onclick="toggleStore(${s.id},0)">停用</button>`
+            : `<button class="btn btn-primary btn-xs" onclick="toggleStore(${s.id},1)">启用</button>`}
+        </td>
+      </tr>
+    `).join('');
+
+    document.getElementById('pageContent').innerHTML = `
+      <div class="table-card">
+        <div class="table-header">
+          <h3>门店列表 (${stores.length})</h3>
+          <button class="btn btn-primary btn-sm" onclick="editStore(0)">+ 新增门店</button>
+        </div>
+        <table>
+          <thead><tr><th>ID</th><th>名称</th><th>城市/区域</th><th>地址</th><th>状态</th><th>订单数</th><th>操作</th></tr></thead>
+          <tbody>${rows || '<tr><td colspan="7" class="empty">暂无门店数据</td></tr>'}</tbody>
+        </table>
+      </div>
+    `;
+  } catch (e) {
+    document.getElementById('pageContent').innerHTML = `<div class="empty">加载失败: ${e.message}</div>`;
+  }
+}
+
+async function editStore(id) {
+  let store = { name:'', address:'', city:'', district:'', latitude:'22.5431', longitude:'113.9294', phone:'', hours:'09:00-22:00', description:'', is_24h:false, tags:[], status:1 };
+
+  if (id > 0) {
+    const data = await apiFetch(API + '/stores/' + id);
+    store = data.data;
+  }
+
+  const title = id > 0 ? '编辑门店' : '新增门店';
+  document.getElementById('modalBox').innerHTML = `
+    <div class="modal-header"><h3>${title}</h3><button class="btn btn-outline btn-sm" onclick="closeModal()">✕</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label>门店名称 *</label><input id="sName" value="${store.name||''}"></div>
+      <div class="form-row">
+        <div class="form-group"><label>城市</label><input id="sCity" value="${store.city||''}" placeholder="如: 深圳市"></div>
+        <div class="form-group"><label>区域</label><input id="sDistrict" value="${store.district||''}" placeholder="如: 南山区"></div>
+      </div>
+      <div class="form-group"><label>详细地址 *</label><input id="sAddress" value="${store.address||''}"></div>
+      <div class="form-row">
+        <div class="form-group"><label>纬度</label><input id="sLat" type="number" step="0.0001" value="${store.latitude||22.5431}"></div>
+        <div class="form-group"><label>经度</label><input id="sLng" type="number" step="0.0001" value="${store.longitude||113.9294}"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>联系电话</label><input id="sPhone" value="${store.phone||''}"></div>
+        <div class="form-group"><label>营业时间</label><input id="sHours" value="${store.hours||'09:00-22:00'}" placeholder="09:00-22:00"></div>
+      </div>
+      <div class="form-group"><label>门店描述</label><textarea id="sDesc" rows="2">${store.description||''}</textarea></div>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+        <label style="display:flex;align-items:center;gap:6px;font-size:13px;">
+          <input type="checkbox" id="s24h" ${store.is_24h?'checked':''}> 24小时营业
+        </label>
+      </div>
+      <div class="map-hint">📍 点击地图选择坐标，或直接在上方输入框修改</div>
+      <div id="storeMap" class="map-container"></div>
+    </div>
+    <div class="modal-footer">
+      ${id > 0 ? `<button class="btn btn-danger btn-sm" onclick="deleteStore(${id})">删除门店</button>` : ''}
+      <button class="btn btn-outline btn-sm" onclick="closeModal()">取消</button>
+      <button class="btn btn-primary btn-sm" onclick="saveStore(${id})">保存</button>
+    </div>
+  `;
+  document.getElementById('modalOverlay').classList.add('show');
+  // Initialize map after modal is visible
+  setTimeout(() => initStoreMap(store.latitude || 22.5431, store.longitude || 113.9294), 0);
+}
+
+let storeMapInstance = null;
+let storeMapMarker = null;
+
+function initStoreMap(lat, lng) {
+  const container = document.getElementById('storeMap');
+  if (!container) return;
+
+  if (typeof TMap === 'undefined') {
+    container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#999;font-size:13px;text-align:center;padding:16px;">地图加载失败：请配置腾讯地图 Key<br>在腾讯位置服务控制台申请 key 后，替换 HTML 中的 YOUR_TENCENT_MAP_KEY</div>';
+    return;
+  }
+
+  container.innerHTML = '';
+
+  try {
+    const center = new TMap.LatLng(parseFloat(lat), parseFloat(lng));
+
+    storeMapInstance = new TMap.Map(container, {
+      zoom: 15,
+      center: center,
+    });
+
+    storeMapMarker = new TMap.MultiMarker({
+      map: storeMapInstance,
+      styles: {
+        default: new TMap.MarkerStyle({ width: 25, height: 35, anchor: { x: 12, y: 34 } })
+      },
+      geometries: [{ id: '1', styleId: 'default', position: center }]
+    });
+
+    storeMapInstance.on('click', (e) => {
+      const pos = e.latLng;
+      storeMapMarker.setGeometries([{ id: '1', styleId: 'default', position: pos }]);
+      document.getElementById('sLat').value = pos.lat.toFixed(6);
+      document.getElementById('sLng').value = pos.lng.toFixed(6);
+    });
+
+    const updateMarkerFromInput = () => {
+      const newLat = parseFloat(document.getElementById('sLat').value);
+      const newLng = parseFloat(document.getElementById('sLng').value);
+      if (!isNaN(newLat) && !isNaN(newLng)) {
+        const newPos = new TMap.LatLng(newLat, newLng);
+        storeMapMarker.setGeometries([{ id: '1', styleId: 'default', position: newPos }]);
+        storeMapInstance.setCenter(newPos);
+      }
+    };
+    document.getElementById('sLat').addEventListener('change', updateMarkerFromInput);
+    document.getElementById('sLng').addEventListener('change', updateMarkerFromInput);
+
+  } catch (err) {
+    console.error('Map init error:', err);
+    container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#999;font-size:13px;">地图初始化失败</div>';
+  }
+}
+
+async function saveStore(id) {
+  const body = {
+    name: document.getElementById('sName').value,
+    city: document.getElementById('sCity').value,
+    district: document.getElementById('sDistrict').value,
+    address: document.getElementById('sAddress').value,
+    latitude: parseFloat(document.getElementById('sLat').value),
+    longitude: parseFloat(document.getElementById('sLng').value),
+    phone: document.getElementById('sPhone').value,
+    hours: document.getElementById('sHours').value,
+    description: document.getElementById('sDesc').value,
+    is_24h: document.getElementById('s24h').checked,
+  };
+
+  if (!body.name || !body.address) { alert('门店名称和地址不能为空'); return; }
+
+  try {
+    const url = id > 0 ? API + '/stores/' + id : API + '/stores';
+    const method = id > 0 ? 'PUT' : 'POST';
+    await apiFetch(url, { method, body: JSON.stringify(body) });
+    closeModal();
+    loadStores();
+  } catch (e) { alert('保存失败: ' + e.message); }
+}
+
+async function toggleStore(id, status) {
+  if (!confirm(`确定要${status===0?'停用':'启用'}该门店吗？`)) return;
+  try {
+    await apiFetch(API + '/stores/' + id, { method: 'PUT', body: JSON.stringify({ status }) });
+    loadStores();
+  } catch (e) { alert('操作失败: ' + e.message); }
+}
+
+async function deleteStore(id) {
+  if (!confirm('确定要删除该门店吗？此操作不可撤销！')) return;
+  try {
+    await apiFetch(API + '/stores/' + id, { method: 'DELETE' });
+    closeModal();
+    loadStores();
+  } catch (e) { alert('删除失败: ' + e.message); }
+}
+
+// ============ Orders ============
+let orderPage = 1, orderStatus = '', orderKeyword = '';
+async function loadOrders() {
+  try {
+    const params = new URLSearchParams({ page: orderPage, pageSize: 15, ...(orderStatus && { status: orderStatus }), ...(orderKeyword && { keyword: orderKeyword }) });
+    const data = await apiFetch(API + '/orders?' + params);
+    const { list, total, page, totalPages } = data.data;
+
+    const statusLabels = {
+      pending_payment:'待付款', paid:'已支付', preparing:'制作中', ready:'待取餐',
+      delivering:'配送中', completed:'已完成', cancelled:'已取消'
+    };
+    const statusColors = {
+      pending_payment:'badge-warning', paid:'badge-info', preparing:'badge-info',
+      ready:'badge-success', delivering:'badge-info', completed:'badge-success', cancelled:'badge-muted'
+    };
+
+    const rows = list.map(o => `
+      <tr>
+        <td><code>${o.order_no}</code></td>
+        <td>${o.nickname||'--'}</td>
+        <td>¥${(o.pay_amount||0).toFixed(2)}</td>
+        <td><span class="badge ${statusColors[o.status]||'badge-muted'}">${statusLabels[o.status]||o.status}</span></td>
+        <td>${o.store_name||'--'}</td>
+        <td>${new Date(o.created_at).toLocaleString('zh-CN')}</td>
+        <td>
+          <button class="btn btn-outline btn-xs" onclick="viewOrder(${o.id})">详情</button>
+          <select onchange="changeOrderStatus(${o.id},this.value)" style="padding:2px 4px;font-size:11px;border-radius:4px;border:1px solid var(--border);margin-left:4px;">
+            <option value="">改状态</option>
+            ${Object.entries(statusLabels).map(([k,v]) => `<option value="${k}">${v}</option>`).join('')}
+          </select>
+        </td>
+      </tr>
+    `).join('');
+
+    // Pagination
+    let pagHtml = '';
+    for (let i = 1; i <= totalPages; i++) {
+      pagHtml += `<button class="${i===page?'active':''}" onclick="orderPage=${i};loadOrders()">${i}</button>`;
+    }
+
+    // Status filter tabs
+    const statusTabs = [{ v:'', l:'全部' }, ...Object.entries(statusLabels).map(([k,v]) => ({ v:k, l:v }))];
+    const tabsHtml = statusTabs.map(t => `<button class="btn btn-sm ${orderStatus===t.v?'btn-primary':'btn-outline'}" onclick="orderStatus='${t.v}';orderPage=1;loadOrders()">${t.l}</button>`).join('');
+
+    document.getElementById('pageContent').innerHTML = `
+      <div class="table-card">
+        <div class="table-header">
+          <h3>订单管理 (${total})</h3>
+          <div class="search-bar">
+            <input id="orderSearch" placeholder="搜索订单号/用户..." value="${orderKeyword}" onkeydown="if(event.key==='Enter'){orderKeyword=this.value;orderPage=1;loadOrders()}">
+            <button class="btn btn-outline btn-sm" onclick="orderKeyword=document.getElementById('orderSearch').value;orderPage=1;loadOrders()">搜索</button>
+          </div>
+        </div>
+        <div style="padding:12px 20px;display:flex;gap:6px;flex-wrap:wrap;">${tabsHtml}</div>
+        <table>
+          <thead><tr><th>订单号</th><th>用户</th><th>金额</th><th>状态</th><th>门店</th><th>时间</th><th>操作</th></tr></thead>
+          <tbody>${rows || '<tr><td colspan="7" class="empty">暂无订单</td></tr>'}</tbody>
+        </table>
+        ${totalPages > 1 ? `<div class="pagination">${pagHtml}</div>` : ''}
+      </div>
+    `;
+  } catch (e) {
+    document.getElementById('pageContent').innerHTML = `<div class="empty">加载失败: ${e.message}</div>`;
+  }
+}
+
+async function viewOrder(id) {
+  try {
+    const data = await apiFetch(API + '/orders/' + id);
+    const o = data.data;
+    const items = o.items || [];
+    const statusLabels = { pending_payment:'待付款', paid:'已支付', preparing:'制作中', ready:'待取餐', delivering:'配送中', completed:'已完成', cancelled:'已取消' };
+
+    document.getElementById('modalBox').innerHTML = `
+      <div class="modal-header"><h3>订单详情 - ${o.order_no}</h3><button class="btn btn-outline btn-sm" onclick="closeModal()">✕</button></div>
+      <div class="modal-body">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:13px;">
+          <div><strong>订单状态:</strong> ${statusLabels[o.status]||o.status}</div>
+          <div><strong>订单类型:</strong> ${o.type==='instant'?'即时配送':'商城订单'}</div>
+          <div><strong>用户:</strong> ${o.nickname||'--'}</div>
+          <div><strong>手机:</strong> ${o.user_phone||'--'}</div>
+          <div><strong>门店:</strong> ${o.store_name||'未指定'}</div>
+          <div><strong>取餐码:</strong> ${o.pickup_code||'--'}</div>
+          <div><strong>商品总额:</strong> ¥${(o.total_amount||0).toFixed(2)}</div>
+          <div><strong>优惠:</strong> ¥${(o.discount_amount||0).toFixed(2)}</div>
+          <div><strong>配送费:</strong> ¥${(o.delivery_fee||0).toFixed(2)}</div>
+          <div><strong>实付金额:</strong> ¥${(o.pay_amount||0).toFixed(2)}</div>
+          <div><strong>创建时间:</strong> ${new Date(o.created_at).toLocaleString('zh-CN')}</div>
+          <div><strong>支付时间:</strong> ${o.paid_at?new Date(o.paid_at).toLocaleString('zh-CN'):'--'}</div>
+        </div>
+        <hr style="margin:16px 0;border-color:var(--border);">
+        <h4 style="margin-bottom:8px;">商品明细</h4>
+        <table style="width:100%;"><thead><tr><th>商品</th><th>规格</th><th>单价</th><th>数量</th><th>小计</th></tr></thead>
+        <tbody>${items.map(i => `<tr><td>${i.product_name}</td><td>${i.spec_text||'--'}</td><td>¥${(i.price||0).toFixed(2)}</td><td>×${i.quantity}</td><td>¥${(i.subtotal||0).toFixed(2)}</td></tr>`).join('')}</tbody></table>
+      </div>
+    `;
+    document.getElementById('modalOverlay').classList.add('show');
+  } catch (e) { alert('加载失败: ' + e.message); }
+}
+
+async function changeOrderStatus(id, status) {
+  if (!status) return;
+  if (!confirm(`确定将订单状态改为"${status}"吗？`)) return;
+  try {
+    await apiFetch(API + '/orders/' + id + '/status', { method: 'PUT', body: JSON.stringify({ status }) });
+    loadOrders();
+  } catch (e) { alert('操作失败: ' + e.message); }
+}
+
+// ============ Products ============
+async function loadProducts() {
+  try {
+    const data = await apiFetch(API + '/products');
+    const products = data.data;
+
+    const rows = products.map(p => `
+      <tr>
+        <td>${p.id}</td>
+        <td>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <img src="${(p.images&&p.images[0])?(p.images[0].startsWith('http')?p.images[0]:p.images[0]):''}" style="width:40px;height:40px;border-radius:6px;object-fit:cover;background:#f5f5f5;" onerror="this.style.opacity=0.3" />
+            <strong>${p.name}</strong>
+          </div>
+        </td>
+        <td>${p.category_name||'--'}</td>
+        <td>¥${(p.sale_price||p.price||0).toFixed(2)}</td>
+        <td>${p.stock||0}</td>
+        <td>${p.sales||0}</td>
+        <td><span class="badge ${p.status===1?'badge-success':'badge-muted'}">${p.status===1?'上架':'下架'}</span></td>
+        <td>
+          <button class="btn btn-primary btn-xs" onclick="editProductImages(${p.id})">📷 图片</button>
+          <button class="btn btn-outline btn-xs" onclick="toggleProduct(${p.id},${p.status===1?0:1})">${p.status===1?'下架':'上架'}</button>
+        </td>
+      </tr>
+    `).join('');
+
+    document.getElementById('pageContent').innerHTML = `
+      <div class="table-card">
+        <div class="table-header"><h3>商品列表 (${products.length})</h3></div>
+        <div style="overflow-x:auto;">
+          <table>
+            <thead><tr><th>ID</th><th>名称</th><th>分类</th><th>售价</th><th>库存</th><th>销量</th><th>状态</th><th>操作</th></tr></thead>
+            <tbody>${rows || '<tr><td colspan="8" class="empty">暂无商品</td></tr>'}</tbody>
+          </table>
+        </div>
+      </div>
+    `;
+  } catch (e) {
+    document.getElementById('pageContent').innerHTML = `<div class="empty">加载失败: ${e.message}</div>`;
+  }
+}
+
+// ============ Product Image Editor ============
+async function editProductImages(id) {
+  try {
+    const data = await apiFetch(API + '/products/' + id);
+    const product = data.data;
+    const images = product.images || [];
+
+    document.getElementById('pageContent').innerHTML = `
+      <div class="table-card">
+        <div class="table-header">
+          <h3>📷 编辑商品图片 — ${product.name}</h3>
+          <button class="btn btn-outline" onclick="loadProducts()">← 返回列表</button>
+        </div>
+        <div style="padding:20px;">
+          <h4 style="margin-bottom:12px;">当前图片</h4>
+          <div id="imageList" style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px;">
+            ${images.map((img, i) => `
+              <div style="position:relative;width:120px;height:120px;border:1px solid #ddd;border-radius:8px;overflow:hidden;">
+                <img src="${img.startsWith('http')?img:img}" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.opacity=0.2" />
+                <button onclick="removeImage(${id},${i})" style="position:absolute;top:4px;right:4px;background:rgba(0,0,0,0.6);color:#fff;border:none;border-radius:50%;width:24px;height:24px;cursor:pointer;font-size:14px;">×</button>
+                <div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.5);color:#fff;font-size:11px;text-align:center;padding:2px;">图${i+1}</div>
+              </div>
+            `).join('') || '<div style="color:#999;">暂无图片</div>'}
+          </div>
+
+          <h4 style="margin-bottom:12px;">上传新图片</h4>
+          <div style="border:2px dashed #ccc;border-radius:8px;padding:40px;text-align:center;cursor:pointer;" id="uploadArea">
+            <div style="font-size:48px;color:#ccc;">📷</div>
+            <p style="color:#666;">点击选择图片或拖拽到此处</p>
+            <p style="color:#999;font-size:12px;">支持 JPG / PNG / WEBP，最大 5MB</p>
+            <input type="file" id="fileInput" accept="image/*" style="display:none;" onchange="uploadProductImage(${id},this.files[0])" />
+          </div>
+          <div id="uploadProgress" style="margin-top:12px;"></div>
+        </div>
+      </div>
+    `;
+
+    // Click to upload
+    document.getElementById('uploadArea').onclick = () => {
+      document.getElementById('fileInput').click();
+    };
+  } catch (e) {
+    document.getElementById('pageContent').innerHTML = `<div class="empty">加载失败: ${e.message}</div>`;
+  }
+}
+
+async function uploadProductImage(productId, file) {
+  if (!file) return;
+  const progress = document.getElementById('uploadProgress');
+  progress.innerHTML = '<p style="color:#666;">⏳ 上传中...</p>';
+
+  try {
+    const formData = new FormData();
+    formData.append('image', file);
+
+    const token = localStorage.getItem('adminToken');
+    const resp = await fetch('/admin/upload', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + token },
+      body: formData,
+    });
+    const result = await resp.json();
+
+    if (result.code !== 200) throw new Error(result.message || '上传失败');
+
+    // Get current product and add the new image
+    const productData = await apiFetch(API + '/products/' + productId);
+    const product = productData.data;
+    const images = product.images || [];
+    images.push(result.data.url);
+
+    // Save updated images
+    await apiFetch(API + '/products/' + productId, {
+      method: 'PUT',
+      body: JSON.stringify({ images }),
+    });
+
+    progress.innerHTML = '<p style="color:green;">✅ 上传成功！</p>';
+    // Reload to show new image
+    setTimeout(() => editProductImages(productId), 500);
+  } catch (e) {
+    progress.innerHTML = `<p style="color:red;">❌ 上传失败: ${e.message}</p>`;
+  }
+}
+
+async function removeImage(productId, index) {
+  if (!confirm('确定删除这张图片？')) return;
+  try {
+    const productData = await apiFetch(API + '/products/' + productId);
+    const product = productData.data;
+    const images = product.images || [];
+    images.splice(index, 1);
+    await apiFetch(API + '/products/' + productId, {
+      method: 'PUT',
+      body: JSON.stringify({ images }),
+    });
+    editProductImages(productId);
+  } catch (e) {
+    alert('删除失败: ' + e.message);
+  }
+}
+
+async function toggleProduct(id, status) {
+  try {
+    await apiFetch(API + '/products/' + id + '/status', { method: 'PUT', body: JSON.stringify({ status }) });
+    loadProducts();
+  } catch (e) { alert('操作失败: ' + e.message); }
+}
+
+// ============ Users ============
+let userPage = 1, userKeyword = '', userRoleFilter = '';
+async function loadUsers() {
+  try {
+    const params = new URLSearchParams({ page: userPage, pageSize: 20, ...(userKeyword && { keyword: userKeyword }), ...(userRoleFilter && { role: userRoleFilter }) });
+    const data = await apiFetch(API + '/users?' + params);
+    const { list, total, page, totalPages } = data.data;
+
+    const roleLabels = { super_admin:'超级管理员', admin:'管理员', store_manager:'门店经理', operator:'运营人员', user:'普通用户' };
+
+    const rows = list.map(u => `
+      <tr>
+        <td>${u.id}</td>
+        <td>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div style="width:28px;height:28px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;">${(u.nickname||'U')[0].toUpperCase()}</div>
+            <div><strong>${u.nickname||'--'}</strong><br><span style="font-size:11px;color:var(--text-muted);">${u.phone||'未绑定'}</span></div>
+          </div>
+        </td>
+        <td><span class="badge role-${u.role}">${roleLabels[u.role]||u.role}</span></td>
+        <td>Lv.${u.level||0}</td>
+        <td>¥${(u.balance||0).toFixed(2)}</td>
+        <td>${u.points||0}</td>
+        <td><span class="badge ${u.status===1?'badge-success':'badge-danger'}">${u.status===1?'正常':'已禁用'}</span></td>
+        <td>${new Date(u.created_at).toLocaleDateString('zh-CN')}</td>
+        <td>
+          ${currentUser.role==='super_admin' ? `
+            <select onchange="changeUserRole(${u.id},this.value)" style="padding:2px 4px;font-size:11px;border-radius:4px;border:1px solid var(--border);margin-bottom:4px;">
+              <option value="">改角色</option>
+              ${Object.entries(roleLabels).map(([k,v]) => `<option value="${k}" ${u.role===k?'selected':''}>${v}</option>`).join('')}
+            </select><br>
+          ` : ''}
+          <button class="btn btn-xs ${u.status===1?'btn-outline':'btn-primary'}" onclick="toggleUser(${u.id},${u.status===1?0:1})">${u.status===1?'禁用':'启用'}</button>
+        </td>
+      </tr>
+    `).join('');
+
+    let pagHtml = '';
+    for (let i = 1; i <= totalPages; i++) {
+      pagHtml += `<button class="${i===page?'active':''}" onclick="userPage=${i};loadUsers()">${i}</button>`;
+    }
+
+    const roleFilterHtml = Object.entries({ '':'全部角色', ...roleLabels }).map(([k,v]) =>
+      `<button class="btn btn-sm ${userRoleFilter===k?'btn-primary':'btn-outline'}" onclick="userRoleFilter='${k}';userPage=1;loadUsers()">${v}</button>`
+    ).join('');
+
+    document.getElementById('pageContent').innerHTML = `
+      <div class="table-card">
+        <div class="table-header">
+          <h3>用户管理 (${total})</h3>
+          <div class="search-bar">
+            <input id="userSearch" placeholder="搜索昵称/手机号..." value="${userKeyword}" onkeydown="if(event.key==='Enter'){userKeyword=this.value;userPage=1;loadUsers()}">
+            <button class="btn btn-outline btn-sm" onclick="userKeyword=document.getElementById('userSearch').value;userPage=1;loadUsers()">搜索</button>
+          </div>
+        </div>
+        <div style="padding:12px 20px;display:flex;gap:6px;flex-wrap:wrap;">${roleFilterHtml}</div>
+        <div style="overflow-x:auto;">
+          <table>
+            <thead><tr><th>ID</th><th>用户</th><th>角色</th><th>等级</th><th>余额</th><th>积分</th><th>状态</th><th>注册时间</th><th>操作</th></tr></thead>
+            <tbody>${rows || '<tr><td colspan="9" class="empty">暂无用户</td></tr>'}</tbody>
+          </table>
+        </div>
+        ${totalPages > 1 ? `<div class="pagination">${pagHtml}</div>` : ''}
+      </div>
+    `;
+  } catch (e) {
+    document.getElementById('pageContent').innerHTML = `<div class="empty">加载失败: ${e.message}</div>`;
+  }
+}
+
+async function changeUserRole(id, role) {
+  if (!role) return;
+  if (!confirm(`确定修改用户角色为"${role}"吗？`)) return;
+  try {
+    await apiFetch(API + '/users/' + id + '/role', { method: 'PUT', body: JSON.stringify({ role }) });
+    loadUsers();
+  } catch (e) { alert('操作失败: ' + e.message); }
+}
+
+async function toggleUser(id, status) {
+  if (!confirm(`确定${status===0?'禁用':'启用'}该用户吗？`)) return;
+  try {
+    await apiFetch(API + '/users/' + id + '/status', { method: 'PUT', body: JSON.stringify({ status }) });
+    loadUsers();
+  } catch (e) { alert('操作失败: ' + e.message); }
+}
+
+// ============ Modal ============
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('show');
+}
+
+// Click overlay to close
+document.getElementById('modalOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+// Enter key login
+document.getElementById('loginPassword').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') doLogin();
+});
+document.getElementById('loginUsername').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') document.getElementById('loginPassword').focus();
+});
+</script>
+</body>
+</html>

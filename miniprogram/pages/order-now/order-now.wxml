@@ -1,0 +1,172 @@
+<!-- pages/order-now/order-now.wxml -->
+<view class="order-page">
+  <!-- Custom Nav Bar -->
+  <view class="nav-bar" style="padding-top: {{statusBarHeight}}px;">
+    <view class="nav-bar-content">
+      <view class="store-selector" bindtap="onStoreTap">
+        <t-icon name="location" size="36rpx" color="#835C45" />
+        <view class="store-info">
+          <view class="store-name">{{currentStore ? currentStore.name : '请选择门店'}}</view>
+          <view class="store-sub" wx:if="{{currentStore}}">{{currentStore.distance ? currentStore.distance + 'm' : ''}} · {{currentStore.hours || '营业中'}}</view>
+        </view>
+        <t-icon name="chevron-right" size="32rpx" color="#999" />
+      </view>
+    </view>
+  </view>
+  <view style="height: {{statusBarHeight + 44}}px;"></view>
+
+  <!-- Category Tabs (horizontally scrollable) -->
+  <scroll-view class="category-tabs" scroll-x="true" enhanced="true" show-scrollbar="{{false}}">
+    <view class="cat-tab {{activeCategory === index ? 'active' : ''}}"
+      wx:for="{{categories}}" wx:key="id"
+      data-id="{{item.id}}" data-index="{{index}}"
+      bindtap="onCategoryTap">
+      <text>{{item.name}}</text>
+      <view class="cat-tab-line" wx:if="{{activeCategory === index}}"></view>
+    </view>
+  </scroll-view>
+
+  <!-- Product List -->
+  <view class="product-list">
+    <!-- Loading -->
+    <view class="loading-wrap" wx:if="{{loadingProducts}}">
+      <t-loading theme="circular" size="40rpx" text="加载中..." />
+    </view>
+
+    <!-- Empty -->
+    <t-empty wx:elif="{{products.length === 0}}" description="该分类暂无商品" />
+
+    <!-- Products -->
+    <view wx:else>
+      <view class="product-card" wx:for="{{products}}" wx:key="id"
+        data-product-id="{{item.id}}" bindtap="onProductTap">
+        <image class="product-img" src="{{item.image}}" mode="aspectFill" lazy-load="true" />
+        <view class="product-info">
+          <view class="product-name cure-ellipsis-2">{{item.name}}</view>
+          <view class="product-desc cure-ellipsis">{{item.description}}</view>
+          <view class="product-tags" wx:if="{{item.tags.length > 0}}">
+            <t-tag wx:for="{{item.tags}}" wx:for-item="tag" wx:key="*this"
+              size="small" variant="light" theme="warning" style="margin-right: 8rpx;">
+              {{tag}}
+            </t-tag>
+          </view>
+          <view class="product-bottom">
+            <view class="product-price-wrap">
+              <text class="cure-price"><text class="cure-price-symbol">¥</text><text class="cure-price-integer">{{item.displayPrice}}</text></text>
+              <text class="cure-price-original" wx:if="{{item.originalPrice}}">¥{{item.originalPrice}}</text>
+            </view>
+            <view class="product-sales">{{item.salesText}}</view>
+          </view>
+        </view>
+        <view class="product-add-btn" catchtap="onAddBtnTap" data-product-id="{{item.id}}">
+          <view class="add-btn-icon">+</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- Bottom spacer for cart bar -->
+  <view style="height: 120rpx;"></view>
+
+  <!-- Floating Cart Bar -->
+  <view class="cart-bar cure-safe-bottom" bindtap="onCartBarTap">
+    <view class="cart-bar-left">
+      <view class="cart-icon-wrap">
+        <t-icon name="cart" size="44rpx" color="{{cartCount > 0 ? '#fff' : '#999'}}" />
+        <view class="cart-badge" wx:if="{{cartCount > 0}}">{{cartCount}}</view>
+      </view>
+      <view class="cart-total">
+        <text class="cart-total-label" wx:if="{{cartCount > 0}}">合计</text>
+        <text class="cart-total-symbol" wx:if="{{cartCount > 0}}">¥</text>
+        <text class="cart-total-num">{{cartTotal}}</text>
+      </view>
+    </view>
+    <view class="cart-bar-right {{cartCount > 0 ? 'active' : ''}}" catchtap="onCheckout">
+      <text>去结算</text>
+    </view>
+  </view>
+
+  <!-- Spec Selection Popup -->
+  <t-popup visible="{{specPopupVisible}}" placement="bottom" bind:visible-change="onSpecPopupClose">
+    <view class="spec-popup" wx:if="{{specProduct}}">
+      <view class="spec-popup-header">
+        <image class="spec-product-img" src="{{specProduct.image}}" mode="aspectFill" />
+        <view class="spec-product-info">
+          <view class="spec-product-name">{{specProduct.name}}</view>
+          <view class="spec-product-price">
+            <text class="cure-price"><text class="cure-price-symbol">¥</text><text class="cure-price-integer">{{specProduct.displayPrice}}</text></text>
+          </view>
+        </view>
+        <t-icon name="close" size="40rpx" color="#999" bindtap="onSpecPopupClose" />
+      </view>
+
+      <scroll-view class="spec-popup-body" scroll-y="true">
+        <view class="spec-group" wx:for="{{specProduct.specs}}" wx:key="name" wx:for-item="spec">
+          <view class="spec-group-title">{{spec.name}}</view>
+          <view class="spec-values">
+            <view class="spec-value {{specSelections[spec.name] === val ? 'active' : ''}}"
+              wx:for="{{spec.values}}" wx:key="*this" wx:for-item="val"
+              data-spec-name="{{spec.name}}" data-value="{{val}}"
+              bindtap="onSpecValueTap">
+              {{val}}
+            </view>
+          </view>
+        </view>
+
+        <view class="spec-group">
+          <view class="spec-group-title">数量</view>
+          <t-stepper value="{{specQuantity}}" min="{{1}}" max="{{99}}" theme="filled" bind:change="onSpecQuantityChange" />
+        </view>
+      </scroll-view>
+
+      <view class="spec-popup-footer cure-safe-bottom">
+        <t-button theme="light" block bindtap="onAddToCart" style="flex: 1; margin-right: 16rpx;">
+          加入购物车
+        </t-button>
+        <t-button theme="primary" block bindtap="onOrderNow" style="flex: 1;">
+          立即下单
+        </t-button>
+      </view>
+    </view>
+  </t-popup>
+
+  <!-- Cart Popup -->
+  <t-popup visible="{{cartPopupVisible}}" placement="bottom" bind:visible-change="onCartPopupClose">
+    <view class="cart-popup">
+      <view class="cart-popup-header">
+        <text class="cart-popup-title">购物车</text>
+        <view class="cart-popup-clear" bindtap="onClearCart" wx:if="{{cartItems.length > 0}}">
+          <t-icon name="delete" size="32rpx" color="#999" />
+          <text>清空</text>
+        </view>
+      </view>
+
+      <scroll-view class="cart-popup-body" scroll-y="true" wx:if="{{cartItems.length > 0}}">
+        <view class="cart-item" wx:for="{{cartItems}}" wx:key="cartId">
+          <image class="cart-item-img" src="{{item.image}}" mode="aspectFill" />
+          <view class="cart-item-info">
+            <view class="cart-item-name cure-ellipsis">{{item.name}}</view>
+            <view class="cart-item-spec cure-ellipsis">{{item.specText}}</view>
+            <view class="cart-item-price">
+              <text class="cure-price"><text class="cure-price-symbol">¥</text>{{item.price}}</text>
+            </view>
+          </view>
+          <t-stepper value="{{item.quantity}}" min="{{0}}" max="{{99}}" theme="filled"
+            data-index="{{index}}" bind:change="onCartItemQtyChange" />
+        </view>
+      </scroll-view>
+
+      <view class="cart-popup-empty" wx:else>
+        <t-empty description="购物车是空的" />
+      </view>
+
+      <view class="cart-popup-footer cure-safe-bottom" wx:if="{{cartItems.length > 0}}">
+        <view class="cart-popup-total">
+          <text class="cart-popup-total-label">合计</text>
+          <text class="cure-price"><text class="cure-price-symbol">¥</text><text class="cure-price-integer">{{cartTotal}}</text></text>
+        </view>
+        <t-button theme="primary" bindtap="onCheckout" style="width: 240rpx;">去结算</t-button>
+      </view>
+    </view>
+  </t-popup>
+</view>

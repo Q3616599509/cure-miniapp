@@ -1,0 +1,75 @@
+<!-- pages/address-edit/address-edit.wxml -->
+<view class="edit-page">
+  <!-- Form -->
+  <t-cell-group theme="card">
+    <t-cell title="收件人" required hover>
+      <t-input
+        slot="note"
+        value="{{form.name}}"
+        placeholder="请输入收件人姓名"
+        maxlength="20"
+        align="right"
+        bind:change="onNameInput"
+      />
+    </t-cell>
+
+    <t-cell title="手机号" required hover>
+      <t-input
+        slot="note"
+        value="{{form.phone}}"
+        placeholder="请输入手机号"
+        type="number"
+        maxlength="11"
+        align="right"
+        bind:change="onPhoneInput"
+      />
+    </t-cell>
+
+    <!-- Region Picker (native) -->
+    <picker mode="region"
+      value="{{[form.province, form.city, form.district]}}"
+      bindchange="onRegionChange">
+      <t-cell title="所在地区" required hover arrow>
+        <text slot="note" class="{{regionText ? 'region-text' : 'region-placeholder'}}">
+          {{regionText || '请选择省/市/区'}}
+        </text>
+      </t-cell>
+    </picker>
+
+    <t-cell title="详细地址" required hover>
+      <t-input
+        slot="note"
+        value="{{form.detail}}"
+        placeholder="街道、楼牌号等"
+        maxlength="100"
+        align="right"
+        bind:change="onDetailInput"
+      />
+    </t-cell>
+  </t-cell-group>
+
+  <!-- Map Picker -->
+  <t-cell-group theme="card">
+    <t-cell title="地图选点" hover arrow left-icon="location" bindtap="onChooseLocation">
+      <text slot="note" class="map-picker-hint">点击在地图上确认地址</text>
+    </t-cell>
+  </t-cell-group>
+
+  <!-- Default Switch -->
+  <view class="default-section">
+    <t-cell title="设为默认地址" hover>
+      <t-switch
+        slot="note"
+        value="{{form.is_default}}"
+        bind:change="onDefaultChange"
+      />
+    </t-cell>
+  </view>
+
+  <!-- Save Button -->
+  <view class="save-btn-wrap cure-safe-bottom">
+    <t-button theme="primary" block bindtap="onSave" loading="{{saving}}" disabled="{{saving}}">
+      保存
+    </t-button>
+  </view>
+</view>

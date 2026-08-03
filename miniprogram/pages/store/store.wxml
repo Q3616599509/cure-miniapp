@@ -1,0 +1,108 @@
+<!-- pages/store/store.wxml — 增强版门店选择 -->
+<view class="store-page">
+  <!-- 顶部定位状态栏 -->
+  <view class="location-bar">
+    <view class="location-bar-left">
+      <t-icon name="location" size="32rpx" color="{{locationError ? '#999' : '#07C160'}}" />
+      <text wx:if="{{locating}}" class="location-text">正在定位...</text>
+      <text wx:elif="{{locationError}}" class="location-text location-text--error">定位失败，显示所有门店</text>
+      <text wx:elif="{{farFromStores}}" class="location-text location-text--warn">距离门店较远，请确认位置</text>
+      <text wx:elif="{{locationPoorAccuracy}}" class="location-text location-text--warn">定位精度较低 · 按大致距离排序</text>
+      <text wx:else class="location-text">已精准定位 · 按距离排序</text>
+    </view>
+    <view class="location-bar-right" bindtap="onRelocate">
+      <t-icon name="refresh" size="28rpx" color="#835C45" />
+      <text wx:if="{{!locating}}">重新定位</text>
+    </view>
+  </view>
+
+  <!-- Map View -->
+  <view class="map-container">
+    <map class="map"
+      latitude="{{mapCenter.latitude}}"
+      longitude="{{mapCenter.longitude}}"
+      scale="{{mapScale}}"
+      markers="{{markers}}"
+      show-location="{{userLat ? true : false}}"
+      bindmarkertap="onMarkerTap">
+    </map>
+    <view class="map-overlay">
+      <view class="map-overlay-text">附近 {{stores.length}} 家门店</view>
+    </view>
+  </view>
+
+  <!-- 定位详情 -->
+  <view class="location-info-bar" wx:if="{{locationInfo}}">
+    <text class="location-info-bar-text">{{locationInfo}}</text>
+  </view>
+
+  <!-- 远距离警告 -->
+  <view class="location-far-warning-bar" wx:if="{{farFromStores}}">
+    <t-icon name="error-circle" size="28rpx" color="#f0a020" />
+    <text>您当前位置距离所有门店都较远，可能定位不准确。请检查手机定位是否开启，或在微信开发者工具中设置正确的模拟位置。</text>
+  </view>
+
+  <!-- Search Bar + Sort -->
+  <view class="search-bar">
+    <t-search
+      value="{{searchKeyword}}"
+      placeholder="搜索门店名称或地址"
+      bind:change="onSearchInput"
+      bind:clear="onSearchClear"
+    />
+    <view class="sort-tabs">
+      <view class="sort-tab {{sortBy === 'distance' ? 'sort-tab--active' : ''}}" data-sort="distance" bindtap="onSortChange">
+        按距离
+      </view>
+      <view class="sort-tab {{sortBy === 'name' ? 'sort-tab--active' : ''}}" data-sort="name" bindtap="onSortChange">
+        按名称
+      </view>
+    </view>
+  </view>
+
+  <!-- Store List -->
+  <view class="store-list">
+    <!-- Loading -->
+    <view class="loading-wrap" wx:if="{{loading}}">
+      <t-loading theme="circular" size="40rpx" text="正在查找附近门店..." />
+    </view>
+
+    <!-- Empty -->
+    <t-empty wx:elif="{{filteredStores.length === 0}}" description="未找到相关门店" />
+
+    <!-- Store Cards -->
+    <view wx:else>
+      <view class="store-card {{selectedStoreId === item.id ? 'store-card--selected' : ''}}"
+        wx:for="{{filteredStores}}" wx:key="id"
+        data-store="{{item}}"
+        bindtap="onStoreTap">
+        <view class="store-card-header">
+          <view class="store-card-name">
+            <text wx:if="{{selectedStoreId === item.id}}" class="store-card-check">✓ </text>
+            {{item.name}}
+          </view>
+          <t-tag size="small" theme="success" variant="light" wx:if="{{item.isOpen}}">{{item.statusText}}</t-tag>
+          <t-tag size="small" theme="default" variant="light" wx:else>{{item.statusText}}</t-tag>
+        </view>
+        <view class="store-card-address">
+          <t-icon name="location" size="28rpx" color="#999" />
+          <text class="store-card-address-text cure-ellipsis">{{item.address}}</text>
+        </view>
+        <view class="store-card-meta">
+          <view class="store-card-distance">
+            <t-icon name="navigate" size="28rpx" color="#835C45" />
+            <text>{{item.distanceText}}</text>
+          </view>
+          <view class="store-card-hours">
+            <t-icon name="time" size="28rpx" color="#999" />
+            <text>{{item.hours}}</text>
+          </view>
+          <view class="store-card-nav" catchtap="onNavigateToStore" data-store="{{item}}">
+            <t-icon name="compass" size="28rpx" color="#07C160" />
+            <text>导航</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

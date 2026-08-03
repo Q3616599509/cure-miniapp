@@ -1,0 +1,168 @@
+<!--pages/search/search.wxml — 搜索页-->
+<view class="search-page">
+
+  <!-- ═══ 顶部搜索栏 ═══ -->
+  <view class="search-header" style="padding-top: {{statusBarHeight}}px;">
+    <view class="search-header__content">
+      <view class="search-header__back" bindtap="onBack">
+        <t-icon name="chevron-left" size="44rpx" color="#333" />
+      </view>
+      <view class="search-header__input-wrap">
+        <t-icon name="search" size="32rpx" color="#999" />
+        <input
+          class="search-header__input"
+          placeholder="搜索商品、品牌"
+          placeholder-class="search-header__placeholder"
+          value="{{keyword}}"
+          focus="{{focusInput}}"
+          confirm-type="search"
+          bindinput="onInput"
+          bindconfirm="onSearch"
+        />
+        <view class="search-header__clear" wx:if="{{keyword}}" bindtap="onClear">
+          <t-icon name="close-circle-filled" size="32rpx" color="#ccc" />
+        </view>
+      </view>
+      <view class="search-header__btn" bindtap="onSearch">搜索</view>
+    </view>
+  </view>
+
+  <!-- 占位高度 -->
+  <view style="height: {{navBarHeight}}px;"></view>
+
+  <!-- ═══ 搜索前：历史 + 热搜 ═══ -->
+  <view class="search-default" wx:if="{{!hasSearched}}">
+
+    <!-- 搜索历史 -->
+    <view class="history-section" wx:if="{{searchHistory.length > 0}}">
+      <view class="section-row">
+        <text class="section-row__title">搜索历史</text>
+        <view class="section-row__clear" bindtap="onClearHistory">
+          <t-icon name="delete" size="32rpx" color="#999" />
+        </view>
+      </view>
+      <view class="tag-list">
+        <view
+          wx:for="{{searchHistory}}"
+          wx:key="*this"
+          class="tag-item"
+          data-keyword="{{item}}"
+          bindtap="onKeywordTap"
+        >
+          {{item}}
+        </view>
+      </view>
+    </view>
+
+    <!-- 热门搜索 -->
+    <view class="hot-section">
+      <view class="section-row">
+        <text class="section-row__title">热门搜索</text>
+      </view>
+      <view class="tag-list">
+        <view
+          wx:for="{{hotKeywords}}"
+          wx:key="*this"
+          class="tag-item {{index < 3 ? 'tag-item--hot' : ''}}"
+          data-keyword="{{item}}"
+          bindtap="onKeywordTap"
+        >
+          <text wx:if="{{index < 3}}" class="tag-item__rank">{{index + 1}}</text>
+          <text>{{item}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- ═══ 搜索结果 ═══ -->
+  <view class="search-results" wx:else>
+
+    <!-- 排序栏 -->
+    <view class="sort-bar">
+      <view
+        wx:for="{{sortOptions}}"
+        wx:key="value"
+        class="sort-bar__item {{sortIndex === index ? 'sort-bar__item--active' : ''}}"
+        data-index="{{index}}"
+        bindtap="onSortTap"
+      >
+        <text>{{item.label}}</text>
+        <view class="sort-bar__arrow" wx:if="{{item.isPrice}}">
+          <text class="sort-bar__arrow-up {{sortIndex === index && priceSortAsc ? 'sort-bar__arrow--on' : ''}}">▲</text>
+          <text class="sort-bar__arrow-down {{sortIndex === index && !priceSortAsc ? 'sort-bar__arrow--on' : ''}}">▼</text>
+        </view>
+      </view>
+      <text class="sort-bar__count">共{{total}}件</text>
+    </view>
+
+    <!-- 骨架屏 -->
+    <view class="product-grid" wx:if="{{loading}}">
+      <view class="product-card" wx:for="{{[1,2,3,4]}}" wx:key="*this">
+        <view class="skeleton-block" style="width:100%;height:340rpx;border-radius:16rpx;"></view>
+        <view class="skeleton-block" style="width:80%;height:32rpx;margin-top:16rpx;border-radius:8rpx;"></view>
+        <view class="skeleton-block" style="width:50%;height:32rpx;margin-top:8rpx;border-radius:8rpx;"></view>
+      </view>
+    </view>
+
+    <!-- 商品列表 -->
+    <scroll-view scroll-y class="result-scroll" wx:elif="{{products.length > 0}}" bindscrolltolower="onReachBottom" enhanced show-scrollbar="{{false}}">
+      <view class="product-grid">
+        <view
+          wx:for="{{products}}"
+          wx:key="id"
+          class="product-card"
+          data-id="{{item.id}}"
+          bindtap="onProductTap"
+        >
+          <view class="product-card__image-wrap">
+            <t-image
+              src="{{item.images[0]}}"
+              mode="aspectFill"
+              width="100%"
+              height="340rpx"
+              shape="round"
+              lazy
+            />
+            <view class="product-card__tags" wx:if="{{item.is_hot || item.is_new}}">
+              <text class="tag-hot" wx:if="{{item.is_hot}}">HOT</text>
+              <text class="tag-new" wx:if="{{item.is_new}}">NEW</text>
+            </view>
+          </view>
+          <view class="product-card__info">
+            <view class="product-card__name">
+              <text
+                wx:for="{{item.highlightName}}"
+                wx:for-item="part"
+                wx:key="index"
+                class="{{part.highlight ? 'highlight' : ''}}"
+              >{{part.text}}</text>
+            </view>
+            <view class="product-card__bottom">
+              <view class="product-card__price">
+                <text class="price-symbol text-primary">¥</text>
+                <text class="price-integer text-primary">{{item.sale_price}}</text>
+                <text class="price-original" wx:if="{{item.price > item.sale_price}}">¥{{item.price}}</text>
+              </view>
+              <text class="product-card__sales">已售{{item.sales}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 加载更多 -->
+      <view class="load-more">
+        <t-loading wx:if="{{loadingMore}}" theme="circular" size="40rpx" text="加载中..." />
+        <text wx:elif="{{!hasMore}}" class="load-more__text">— 已经到底啦 —</text>
+      </view>
+    </scroll-view>
+
+    <!-- 空状态 -->
+    <view class="empty-state" wx:elif="{{!loading}}">
+      <t-icon name="search" size="200rpx" color="#ddd" />
+      <text class="empty-state__text">没有找到 "{{keyword}}" 相关商品</text>
+      <view class="empty-state__tips">
+        <text>试试其他关键词，或浏览热门商品</text>
+      </view>
+    </view>
+  </view>
+</view>

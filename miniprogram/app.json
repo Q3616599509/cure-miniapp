@@ -1,0 +1,76 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/order-now/order-now",
+    "pages/member/member",
+    "pages/user/user",
+    "pages/store/store",
+    "pages/points/points",
+    "pages/coupons/coupons",
+    "pages/address/address",
+    "pages/address-edit/address-edit",
+    "pages/balance/balance",
+    "pages/favorites/favorites",
+    "pages/settings/settings",
+    "pages/category/category",
+    "pages/cart/cart",
+    "pages/search/search",
+    "pages/product/product",
+    "pages/checkout/checkout",
+    "pages/order-detail/order-detail",
+    "pages/order-list/order-list",
+    "pages/service/service"
+  ],
+  "window": {
+    "navigationBarBackgroundColor": "#ffffff",
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "Cure",
+    "backgroundColor": "#f5f5f5",
+    "backgroundTextStyle": "dark",
+    "enablePullDownRefresh": false
+  },
+  "tabBar": {
+    "color": "#999999",
+    "selectedColor": "#835C45",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页",
+        "iconPath": "assets/tabbar/home.png",
+        "selectedIconPath": "assets/tabbar/home-active.png"
+      },
+      {
+        "pagePath": "pages/order-now/order-now",
+        "text": "点单",
+        "iconPath": "assets/tabbar/shop.png",
+        "selectedIconPath": "assets/tabbar/shop-active.png"
+      },
+      {
+        "pagePath": "pages/member/member",
+        "text": "会员",
+        "iconPath": "assets/tabbar/vip.png",
+        "selectedIconPath": "assets/tabbar/vip-active.png"
+      },
+      {
+        "pagePath": "pages/user/user",
+        "text": "我的",
+        "iconPath": "assets/tabbar/user.png",
+        "selectedIconPath": "assets/tabbar/user-active.png"
+      }
+    ]
+  },
+  "usingComponents": {},
+  "permission": {
+    "scope.userLocation": {
+      "desc": "用于查找附近的 Cure 门店"
+    }
+  },
+  "requiredPrivateInfos": [
+    "getLocation",
+    "chooseAddress"
+  ],
+  "lazyCodeLoading": "requiredComponents",
+  "sitemapLocation": "sitemap.json"
+}

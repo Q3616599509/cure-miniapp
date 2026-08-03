@@ -1,0 +1,137 @@
+<!--pages/category/category.wxml — 分类页-->
+<view class="category-page">
+
+  <!-- 顶部搜索栏 -->
+  <view class="top-bar">
+    <view class="top-bar__search" bindtap="onSearchTap">
+      <t-icon name="search" size="32rpx" color="#999" />
+      <text class="top-bar__search-text">搜索商品</text>
+    </view>
+    <view class="top-bar__cart" bindtap="onCartTap">
+      <t-icon name="cart" size="44rpx" color="#333" />
+      <view class="top-bar__cart-badge" wx:if="{{cartCount > 0}}">{{cartCount}}</view>
+    </view>
+  </view>
+
+  <!-- 主体：左分类 + 右内容 -->
+  <view class="category-body">
+
+    <!-- 左侧分类列表 -->
+    <scroll-view scroll-y class="sidebar" enhanced show-scrollbar="{{false}}">
+      <view
+        wx:for="{{categories}}"
+        wx:key="id"
+        class="sidebar-item {{activeIndex === index ? 'sidebar-item--active' : ''}}"
+        data-index="{{index}}"
+        bindtap="onCategoryTap"
+      >
+        <view class="sidebar-item__bar" wx:if="{{activeIndex === index}}"></view>
+        <text class="sidebar-item__text">{{item.name}}</text>
+      </view>
+      <!-- 底部安全区占位 -->
+      <view style="height: 40rpx;"></view>
+    </scroll-view>
+
+    <!-- 右侧内容 -->
+    <scroll-view scroll-y class="content" enhanced show-scrollbar="{{false}}" bindscrolltolower="onReachBottom">
+
+      <!-- 子分类标签 -->
+      <view class="sub-cats" wx:if="{{subCategories.length > 0}}">
+        <view class="sub-cats__list">
+          <view class="sub-cats__item sub-cats__item--all">全部</view>
+          <view
+            wx:for="{{subCategories}}"
+            wx:key="id"
+            class="sub-cats__item"
+            data-id="{{item.id}}"
+            bindtap="onSubCategoryTap"
+          >
+            {{item.name}}
+          </view>
+        </view>
+      </view>
+
+      <!-- 排序栏 -->
+      <view class="sort-bar">
+        <view
+          wx:for="{{sortOptions}}"
+          wx:key="value"
+          class="sort-bar__item {{sortIndex === index ? 'sort-bar__item--active' : ''}}"
+          data-index="{{index}}"
+          bindtap="onSortTap"
+        >
+          <text>{{item.label}}</text>
+          <view class="sort-bar__arrow" wx:if="{{item.isPrice}}">
+            <text class="sort-bar__arrow-up {{sortIndex === index && priceSortAsc ? 'sort-bar__arrow--on' : ''}}">▲</text>
+            <text class="sort-bar__arrow-down {{sortIndex === index && !priceSortAsc ? 'sort-bar__arrow--on' : ''}}">▼</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 商品列表 -->
+      <view class="product-section">
+        <!-- 骨架屏 -->
+        <view class="product-grid" wx:if="{{loading}}">
+          <view class="product-card" wx:for="{{[1,2,3,4]}}" wx:key="*this">
+            <view class="skeleton-block" style="width:100%;height:340rpx;border-radius:16rpx;"></view>
+            <view class="skeleton-block" style="width:80%;height:32rpx;margin-top:16rpx;border-radius:8rpx;"></view>
+            <view class="skeleton-block" style="width:50%;height:32rpx;margin-top:8rpx;border-radius:8rpx;"></view>
+          </view>
+        </view>
+
+        <!-- 商品卡片 -->
+        <view class="product-grid" wx:elif="{{products.length > 0}}">
+          <view
+            wx:for="{{products}}"
+            wx:key="id"
+            class="product-card"
+            data-id="{{item.id}}"
+            bindtap="onProductTap"
+          >
+            <view class="product-card__image-wrap">
+              <t-image
+                src="{{item.images[0]}}"
+                mode="aspectFill"
+                width="100%"
+                height="340rpx"
+                shape="round"
+                lazy
+              />
+              <view class="product-card__tags" wx:if="{{item.is_hot || item.is_new}}">
+                <text class="tag-hot" wx:if="{{item.is_hot}}">HOT</text>
+                <text class="tag-new" wx:if="{{item.is_new}}">NEW</text>
+              </view>
+            </view>
+            <view class="product-card__info">
+              <text class="product-card__name text-ellipsis-2">{{item.name}}</text>
+              <text class="product-card__desc text-ellipsis">{{item.description}}</text>
+              <view class="product-card__bottom">
+                <view class="product-card__price">
+                  <text class="price-symbol text-primary">¥</text>
+                  <text class="price-integer text-primary">{{item.sale_price}}</text>
+                  <text class="price-original" wx:if="{{item.price > item.sale_price}}">¥{{item.price}}</text>
+                </view>
+                <text class="product-card__sales">已售{{item.sales}}</text>
+              </view>
+            </view>
+          </view>
+        </view>
+
+        <!-- 空状态 -->
+        <view class="empty-state" wx:else>
+          <t-icon name="shop" size="200rpx" color="#ddd" />
+          <text class="empty-state__text">该分类下暂无商品</text>
+        </view>
+
+        <!-- 加载更多 -->
+        <view class="load-more" wx:if="{{!loading && products.length > 0}}">
+          <t-loading wx:if="{{loadingMore}}" theme="circular" size="40rpx" text="加载中..." />
+          <text wx:elif="{{!hasMore}}" class="load-more__text">— 已经到底啦 —</text>
+        </view>
+      </view>
+
+      <!-- 底部占位 -->
+      <view style="height: 40rpx;"></view>
+    </scroll-view>
+  </view>
+</view>

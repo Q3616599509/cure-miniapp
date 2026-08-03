@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f5f0eb"/>
+      <stop offset="100%" style="stop-color:#e8ddd3"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="400" fill="url(#bg)"/>
+  <g transform="translate(200,200)">
+    <circle cx="0" cy="-20" r="50" fill="none" stroke="#835C45" stroke-width="8" opacity="0.3"/>
+    <path d="M-30,-20 L-30,40 L30,40 L30,-20 Z" fill="none" stroke="#835C45" stroke-width="8" opacity="0.3"/>
+    <text x="0" y="90" text-anchor="middle" font-family="sans-serif" font-size="24" fill="#835C45" opacity="0.4">Cure</text>
+  </g>
+</svg>

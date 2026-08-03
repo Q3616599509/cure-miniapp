@@ -1,0 +1,233 @@
+<!--pages/product/product.wxml — 商品详情页-->
+<view class="product-page" wx:if="{{!loading && product}}">
+
+  <!-- ═══ 图片轮播 ═══ -->
+  <view class="image-swiper-wrap">
+    <swiper
+      class="image-swiper"
+      circular
+      autoplay
+      interval="4000"
+      duration="500"
+      bindchange="onSwiperChange"
+    >
+      <swiper-item wx:for="{{product.images}}" wx:key="*this">
+        <view class="image-swiper__item" data-current="{{item}}" bindtap="onPreviewImage">
+          <t-image
+            src="{{item}}"
+            mode="aspectFill"
+            width="100%"
+            height="750rpx"
+            lazy
+          />
+        </view>
+      </swiper-item>
+    </swiper>
+    <view class="image-swiper__indicator">
+      {{swiperCurrent + 1}} / {{product.images.length}}
+    </view>
+
+    <!-- 收藏按钮 -->
+    <view class="fav-btn" bindtap="onFavoriteToggle">
+      <t-icon
+        name="{{isFavorited ? 'star-filled' : 'star'}}"
+        size="48rpx"
+        color="{{isFavorited ? '#FF5C39' : '#666'}}"
+      />
+    </view>
+  </view>
+
+  <!-- ═══ 价格信息区 ═══ -->
+  <view class="price-section">
+    <view class="price-section__main">
+      <view class="price-section__sale">
+        <text class="price-symbol">¥</text>
+        <text class="price-section__sale-num">{{selectedSku && selectedSku.price ? selectedSku.price : product.sale_price}}</text>
+      </view>
+      <view class="price-section__original" wx:if="{{showOriginalPrice}}">
+        <text class="price-original">¥{{product.price}}</text>
+      </view>
+      <view class="price-section__member" wx:if="{{product.member_price}}">
+        <text class="price-section__member-label">会员价</text>
+        <text class="price-section__member-value">¥{{product.member_price}}</text>
+      </view>
+    </view>
+    <view class="price-section__tags">
+      <text class="tag-hot" wx:if="{{product.is_hot}}">热销</text>
+      <text class="tag-new" wx:if="{{product.is_new}}">新品</text>
+      <t-tag
+        wx:for="{{product.tags}}"
+        wx:key="*this"
+        theme="warning"
+        size="small"
+        variant="light"
+        style="margin-right: 8rpx;"
+      >{{item}}</t-tag>
+    </view>
+  </view>
+
+  <!-- ═══ 商品标题 ═══ -->
+  <view class="title-section">
+    <text class="title-section__name">{{product.name}}</text>
+    <text class="title-section__desc" wx:if="{{product.description}}">{{product.description}}</text>
+    <view class="title-section__meta">
+      <text class="title-section__sales">已售{{product.sales}}件</text>
+      <text class="title-section__stock">库存{{selectedSku ? selectedSku.stock : product.stock}}件</text>
+    </view>
+  </view>
+
+  <!-- ═══ 规格选择入口 ═══ -->
+  <view class="spec-entry card" bindtap="openSkuPopup" data-mode="cart" wx:if="{{product.specs.length > 0}}">
+    <view class="spec-entry__left">
+      <text class="spec-entry__label">选择</text>
+      <text class="spec-entry__value">
+        <block wx:for="{{product.specs}}" wx:key="name">
+          {{item.name}}：{{selectedSpecs[item.name]}}{{index < product.specs.length - 1 ? ' / ' : ''}}
+        </block>
+      </text>
+    </view>
+    <t-icon name="chevron-right" size="40rpx" color="#ccc" />
+  </view>
+
+  <!-- ═══ 商品描述 ═══ -->
+  <view class="desc-section card">
+    <view class="desc-section__header">
+      <view class="desc-section__bar"></view>
+      <text class="desc-section__title">商品详情</text>
+    </view>
+    <view class="desc-section__content">
+      <text class="desc-section__text">{{product.description}}</text>
+      <view class="desc-section__images">
+        <t-image
+          wx:for="{{product.images}}"
+          wx:key="*this"
+          src="{{item}}"
+          mode="widthFix"
+          width="100%"
+          lazy
+        />
+      </view>
+    </view>
+  </view>
+
+  <!-- ═══ 底部占位 ═══ -->
+  <view class="bottom-placeholder"></view>
+
+  <!-- ═══ 底部操作栏 ═══ -->
+  <view class="action-bar safe-bottom-fixed">
+    <view class="action-bar__icons">
+      <view class="action-bar__icon-item" bindtap="onCartTap">
+        <t-icon name="cart" size="44rpx" color="#333" />
+        <text class="action-bar__icon-text">购物车</text>
+        <view class="action-bar__badge" wx:if="{{cartCount > 0}}">{{cartCount}}</view>
+      </view>
+      <view class="action-bar__icon-item" bindtap="onContactTap">
+        <t-icon name="service" size="44rpx" color="#333" />
+        <text class="action-bar__icon-text">客服</text>
+      </view>
+      <button class="action-bar__share-btn" open-type="share">
+        <t-icon name="share-1" size="44rpx" color="#333" />
+        <text class="action-bar__icon-text">分享</text>
+      </button>
+    </view>
+    <view class="action-bar__buttons">
+      <view class="action-bar__btn action-bar__btn--cart" data-mode="cart" bindtap="openSkuPopup">
+        加入购物车
+      </view>
+      <view class="action-bar__btn action-bar__btn--buy" data-mode="buy" bindtap="openSkuPopup">
+        立即购买
+      </view>
+    </view>
+  </view>
+
+  <!-- ═══ SKU 选择弹窗 ═══ -->
+  <t-popup
+    visible="{{showSkuPopup}}"
+    placement="bottom"
+    bind:visible-change="closeSkuPopup"
+  >
+    <view class="sku-popup">
+      <!-- 商品信息 -->
+      <view class="sku-popup__header">
+        <t-image
+          src="{{product.images[0]}}"
+          mode="aspectFill"
+          width="180rpx"
+          height="180rpx"
+          shape="round"
+        />
+        <view class="sku-popup__info">
+          <text class="sku-popup__price">
+            <text class="price-symbol text-primary">¥</text>
+            <text class="price-integer text-primary">{{selectedSku && selectedSku.price ? selectedSku.price : product.sale_price}}</text>
+          </text>
+          <text class="sku-popup__stock" wx:if="{{selectedSku}}">库存{{selectedSku.stock}}件</text>
+          <text class="sku-popup__stock" wx:else>库存{{product.stock}}件</text>
+          <text class="sku-popup__selected">
+            已选：{{selectedSkuText}}
+          </text>
+        </view>
+        <view class="sku-popup__close" bindtap="closeSkuPopup">
+          <t-icon name="close" size="40rpx" color="#999" />
+        </view>
+      </view>
+
+      <!-- 规格选择 -->
+      <scroll-view scroll-y class="sku-popup__body" enhanced show-scrollbar="{{false}}">
+        <view
+          wx:for="{{product.specs}}"
+          wx:key="name"
+          class="spec-group"
+        >
+          <text class="spec-group__name">{{item.name}}</text>
+          <view class="spec-group__values">
+            <view
+              wx:for="{{item.values}}"
+              wx:for-item="val"
+              wx:key="*this"
+              class="spec-value {{selectedSpecs[item.name] === val ? 'spec-value--active' : ''}}"
+              data-spec-name="{{item.name}}"
+              data-value="{{val}}"
+              bindtap="onSpecSelect"
+            >
+              {{val}}
+            </view>
+          </view>
+        </view>
+      </scroll-view>
+
+      <!-- 数量选择 -->
+      <view class="sku-popup__quantity">
+        <text class="sku-popup__quantity-label">数量</text>
+        <t-stepper
+          value="{{quantity}}"
+          min="1"
+          max="{{selectedSku ? selectedSku.stock : product.stock}}"
+          theme="filled"
+          bind:change="onQuantityChange"
+        />
+      </view>
+
+      <!-- 确认按钮 -->
+      <view class="sku-popup__footer safe-bottom">
+        <view class="sku-popup__confirm" bindtap="onSkuConfirm">
+          {{skuMode === 'cart' ? '加入购物车' : '立即购买'}}
+        </view>
+      </view>
+    </view>
+  </t-popup>
+</view>
+
+<!-- ═══ 加载中骨架屏 ═══ -->
+<view class="product-page" wx:elif="{{loading}}">
+  <view class="skeleton-block" style="width:100%;height:750rpx;"></view>
+  <view class="card" style="margin:24rpx;">
+    <view class="skeleton-block" style="width:60%;height:60rpx;border-radius:12rpx;"></view>
+    <view class="skeleton-block" style="width:100%;height:40rpx;margin-top:24rpx;border-radius:8rpx;"></view>
+    <view class="skeleton-block" style="width:100%;height:40rpx;margin-top:16rpx;border-radius:8rpx;"></view>
+  </view>
+  <view class="card" style="margin:24rpx;">
+    <view class="skeleton-block" style="width:30%;height:40rpx;border-radius:8rpx;"></view>
+    <view class="skeleton-block" style="width:100%;height:200rpx;margin-top:24rpx;border-radius:8rpx;"></view>
+  </view>
+</view>

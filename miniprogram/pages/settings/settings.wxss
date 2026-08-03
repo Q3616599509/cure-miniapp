@@ -1,0 +1,38 @@
+/* pages/settings/settings.wxss */
+.settings-page {
+  min-height: 100vh;
+  background: var(--cure-bg-page);
+  padding: 16rpx 0 80rpx;
+}
+
+.section-label {
+  font-size: 24rpx;
+  color: var(--cure-text-secondary);
+  padding: 24rpx 32rpx 12rpx;
+  text-transform: uppercase;
+  letter-spacing: 1rpx;
+}
+
+/* ── Logout ── */
+.logout-section {
+  padding: 48rpx 32rpx;
+}
+
+/* ── Footer ── */
+.footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40rpx 0;
+}
+
+.footer-version {
+  font-size: 26rpx;
+  color: var(--cure-text-placeholder);
+}
+
+.footer-copyright {
+  font-size: 22rpx;
+  color: var(--cure-text-placeholder);
+  margin-top: 8rpx;
+}

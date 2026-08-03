@@ -1,0 +1,116 @@
+<!-- pages/user/user.wxml -->
+<view class="user-page">
+  <!-- User Card Header -->
+  <view class="user-header">
+    <view class="user-header-bg"></view>
+    <view class="user-header-content">
+      <!-- Not logged in -->
+      <block wx:if="{{!isLoggedIn}}">
+        <view class="user-avatar-placeholder">
+          <text class="avatar-icon">👤</text>
+        </view>
+        <view class="user-info">
+          <view class="login-text">点击登录</view>
+          <view class="login-desc">登录后享受更多权益</view>
+        </view>
+        <t-button size="small" theme="primary" open-type="getUserProfile" bindtap="onWxLogin" style="margin-left: auto;">
+          微信登录
+        </t-button>
+      </block>
+
+      <!-- Logged in -->
+      <block wx:else>
+        <view class="user-avatar">
+          <image wx:if="{{userInfo.avatar_url}}" src="{{userInfo.avatar_url}}" mode="aspectFill" class="avatar-img" />
+          <text wx:else class="avatar-icon">👤</text>
+        </view>
+        <view class="user-info">
+          <view class="user-nickname">{{userInfo.nickname || 'Cure用户'}}</view>
+          <view class="user-level" bindtap="goToMember">
+            <text class="level-icon">{{levelIcon}}</text>
+            <text class="level-text">{{levelName}}</text>
+            <text class="level-arrow">›</text>
+          </view>
+        </view>
+      </block>
+    </view>
+
+    <!-- Points + Coupons Stats -->
+    <view class="stats-row" wx:if="{{isLoggedIn}}">
+      <view class="stat-item" bindtap="goToPoints">
+        <view class="stat-value">{{points}}</view>
+        <view class="stat-label">积分</view>
+      </view>
+      <view class="stat-divider"></view>
+      <view class="stat-item" bindtap="goToCoupons">
+        <view class="stat-value">{{couponCount}}</view>
+        <view class="stat-label">优惠券</view>
+      </view>
+      <view class="stat-divider"></view>
+      <view class="stat-item" bindtap="goToMember">
+        <view class="stat-value">{{userInfo.growth || 0}}</view>
+        <view class="stat-label">成长值</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- Order Management Grid -->
+  <view class="section">
+    <view class="section-header">
+      <text class="section-title">我的订单</text>
+      <text class="section-more" data-status="" bindtap="goToOrderList">全部订单 ›</text>
+    </view>
+    <view class="order-grid">
+      <view class="order-grid-item" data-status="pending_payment" bindtap="goToOrderList">
+        <view class="order-grid-icon">💳</view>
+        <t-badge wx:if="{{orderBadges.pending_payment > 0}}" count="{{orderBadges.pending_payment}}" />
+        <view class="order-grid-label">待付款</view>
+      </view>
+      <view class="order-grid-item" data-status="pending_shipment" bindtap="goToOrderList">
+        <view class="order-grid-icon">📦</view>
+        <t-badge wx:if="{{orderBadges.pending_shipment > 0}}" count="{{orderBadges.pending_shipment}}" />
+        <view class="order-grid-label">待发货</view>
+      </view>
+      <view class="order-grid-item" data-status="pending_receipt" bindtap="goToOrderList">
+        <view class="order-grid-icon">🚚</view>
+        <t-badge wx:if="{{orderBadges.pending_receipt > 0}}" count="{{orderBadges.pending_receipt}}" />
+        <view class="order-grid-label">待收货</view>
+      </view>
+      <view class="order-grid-item" data-status="completed" bindtap="goToOrderList">
+        <view class="order-grid-icon">✅</view>
+        <view class="order-grid-label">已完成</view>
+      </view>
+      <view class="order-grid-item" data-status="after_sale" bindtap="goToOrderList">
+        <view class="order-grid-icon">🔄</view>
+        <t-badge wx:if="{{orderBadges.after_sale > 0}}" count="{{orderBadges.after_sale}}" />
+        <view class="order-grid-label">售后</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- Function List -->
+  <view class="section">
+    <view class="section-header">
+      <text class="section-title">常用功能</text>
+    </view>
+    <view class="func-grid">
+      <view class="func-grid-item"
+        wx:for="{{funcList}}" wx:key="name"
+        data-path="{{item.path}}"
+        bindtap="onFuncTap">
+        <view class="func-icon">{{item.icon}}</view>
+        <view class="func-name">{{item.name}}</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- More Functions -->
+  <t-cell-group theme="card">
+    <t-cell title="联系客服" arrow left-icon="service" data-path="/pages/service/service" bindtap="onFuncTap" />
+    <t-cell title="意见反馈" arrow left-icon="chat" data-path="" bindtap="onFuncTap" />
+    <t-cell title="设置" arrow left-icon="setting" bindtap="goToSettings" />
+    <t-cell title="分享 Cure" arrow left-icon="share" />
+  </t-cell-group>
+
+  <view class="footer-version">Cure v1.0.0 · 治愈你的日常好物</view>
+</view>

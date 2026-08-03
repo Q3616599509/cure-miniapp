@@ -1,0 +1,142 @@
+<!-- pages/member/member.wxml -->
+<view class="member-page">
+  <!-- Not logged in -->
+  <view class="not-logged-in" wx:if="{{!isLoggedIn}}">
+    <view class="login-prompt">
+      <view class="login-icon">👑</view>
+      <view class="login-title">登录后查看会员权益</view>
+      <view class="login-desc">享受专属折扣、积分翻倍、免运费等特权</view>
+      <t-button theme="primary" bindtap="onLoginTap" style="margin-top: 32rpx; width: 320rpx;">去登录</t-button>
+    </view>
+  </view>
+
+  <!-- Logged in -->
+  <block wx:elif="{{!loading && memberInfo}}">
+    <!-- Hero Membership Card -->
+    <view class="member-card" style="background: {{levelTheme.gradient}};">
+      <view class="member-card-bg-pattern"></view>
+      <view class="member-card-content">
+        <view class="member-card-top">
+          <view class="member-card-level">
+            <text class="level-icon">{{levelTheme.icon}}</text>
+            <text class="level-name">{{memberInfo.level_name}}</text>
+          </view>
+          <view class="member-card-points">
+            <text class="points-label">积分</text>
+            <text class="points-value">{{memberInfo.points}}</text>
+          </view>
+        </view>
+
+        <!-- Growth Progress -->
+        <view class="growth-section">
+          <view class="growth-info">
+            <text class="growth-current">成长值 {{memberInfo.growth}}</text>
+            <text class="growth-next" wx:if="{{nextLevelName}}">距{{nextLevelName}}还需{{growthRemaining}}</text>
+            <text class="growth-max" wx:else>已达最高等级</text>
+          </view>
+          <view class="growth-bar-track">
+            <view class="growth-bar-fill" style="width: {{memberInfo.growth_progress}}%;"></view>
+          </view>
+        </view>
+
+        <view class="member-card-footer">
+          <text class="card-no">CURE MEMBER · No.{{memberInfo.level + 10086}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- Quick Entries -->
+    <view class="quick-entries">
+      <view class="quick-entry" bindtap="goToPoints">
+        <view class="quick-entry-icon">🎁</view>
+        <text class="quick-entry-text">积分商城</text>
+      </view>
+      <view class="quick-entry" bindtap="goToCoupons">
+        <view class="quick-entry-icon">🎫</view>
+        <text class="quick-entry-text">优惠券中心</text>
+      </view>
+    </view>
+
+    <!-- Benefits Grid -->
+    <view class="section">
+      <view class="section-title">会员权益</view>
+      <view class="benefits-grid">
+        <view class="benefit-card">
+          <view class="benefit-icon">💰</view>
+          <view class="benefit-label">购物折扣</view>
+          <view class="benefit-value">{{discountText}}</view>
+        </view>
+        <view class="benefit-card">
+          <view class="benefit-icon">⚡</view>
+          <view class="benefit-label">积分倍率</view>
+          <view class="benefit-value">{{memberInfo.points_multiplier}}x</view>
+        </view>
+        <view class="benefit-card">
+          <view class="benefit-icon">🚚</view>
+          <view class="benefit-label">免运费门槛</view>
+          <view class="benefit-value">{{freeShippingText}}</view>
+        </view>
+        <view class="benefit-card">
+          <view class="benefit-icon">🎂</view>
+          <view class="benefit-label">生日礼物</view>
+          <view class="benefit-value">{{memberInfo.level >= 1 ? '专属礼券' : '未解锁'}}</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- Level Ladder -->
+    <view class="section">
+      <view class="section-title">等级说明</view>
+      <view class="level-ladder">
+        <view class="level-item {{memberInfo.level === 0 ? 'current' : ''}}">
+          <view class="level-badge">🥉</view>
+          <view class="level-name-text">普通会员</view>
+          <view class="level-growth">0成长值</view>
+        </view>
+        <view class="level-arrow">→</view>
+        <view class="level-item {{memberInfo.level === 1 ? 'current' : ''}}">
+          <view class="level-badge">🥈</view>
+          <view class="level-name-text">银卡会员</view>
+          <view class="level-growth">500成长值</view>
+        </view>
+        <view class="level-arrow">→</view>
+        <view class="level-item {{memberInfo.level === 2 ? 'current' : ''}}">
+          <view class="level-badge">🥇</view>
+          <view class="level-name-text">金卡会员</view>
+          <view class="level-growth">2000成长值</view>
+        </view>
+        <view class="level-arrow">→</view>
+        <view class="level-item {{memberInfo.level === 3 ? 'current' : ''}}">
+          <view class="level-badge">💎</view>
+          <view class="level-name-text">钻石会员</view>
+          <view class="level-growth">5000成长值</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- Points Log -->
+    <view class="section">
+      <view class="section-header">
+        <text class="section-title">积分明细</text>
+        <text class="section-more" bindtap="goToPoints">全部 →</text>
+      </view>
+      <view class="points-log" wx:if="{{pointsLog.length > 0}}">
+        <view class="points-log-item" wx:for="{{pointsLog}}" wx:key="id">
+          <view class="points-log-left">
+            <view class="points-log-desc">{{item.description}}</view>
+            <view class="points-log-time">{{item.timeText}}</view>
+          </view>
+          <view class="points-log-amount {{item.isEarn ? 'earn' : 'spend'}}">
+            {{item.amountText}}
+          </view>
+        </view>
+      </view>
+      <t-empty wx:else description="暂无积分记录" icon="info-circle" />
+    </view>
+  </block>
+
+  <!-- Loading -->
+  <view class="loading-wrap" wx:elif="{{loading}}">
+    <t-loading theme="circular" size="40rpx" text="加载中..." />
+  </view>
+</view>

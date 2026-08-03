@@ -1,0 +1,11 @@
+{
+  "navigationBarTitleText": "商品分类",
+  "navigationBarBackgroundColor": "#ffffff",
+  "navigationBarTextStyle": "black",
+  "backgroundColor": "#f5f6fa",
+  "usingComponents": {
+    "t-icon": "tdesign-miniprogram/icon/icon",
+    "t-loading": "tdesign-miniprogram/loading/loading",
+    "t-image": "tdesign-miniprogram/image/image"
+  }
+}
